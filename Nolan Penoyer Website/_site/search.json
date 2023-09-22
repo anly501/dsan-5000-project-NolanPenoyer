@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "About Me",
+    "section": "",
+    "text": "GU netID: nsp50\nNolan Penoyer is currently a graduate student in the Data Science and Analytics program at Georgetown University. He received his bachelor’s degree in data science from the United States Air Force Academy. Upon graduation, he will work as an operations research analyst in the Air Force. Recently, the Air Force modernized and reclassified its position to focus more on information and big data. The direction the military is headed is clear, and he desires to be a leader in the implementation of the emerging tools in information and advanced analytics in support of the defense of the United States."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "index.html#header-2",
+    "href": "index.html#header-2",
+    "title": "About Me",
+    "section": "Header 2",
+    "text": "Header 2\n\nVestibulum leo velit\ndignissim non felis eget\nfacilisis consectetur tellus\nDonec sagittis\nlibero et facilisis faucibus\n\n\nHeader 3\n\n\nEtiam in mi scelerisque, aliquam mauris id, interdum turpis. Aliquam neque metus, iaculis et sodales non, interdum id nisi. Donec imperdiet vel erat egestas elementum. Vivamus porttitor, diam vel mattis imperdiet, velit est tempor arcu, eget ullamcorper magna arcu nec erat. Nam consectetur sodales orci sit amet fringilla. Suspendisse potenti. Vivamus in maximus elit. Duis libero mauris, commodo id nisi in, viverra rutrum turpis. Vivamus efficitur, augue ullamcorper pellentesque porttitor, enim nibh ultricies nulla, molestie dapibus est elit nec est. Maecenas bibendum ut ante eget porttitor. Proin blandit aliquet nibh et rhoncus. Maecenas in rutrum nulla, scelerisque ultrices urna.\n\nCurabitur facilisis urna ut risus fermentum tincidunt. Mauris euismod tincidunt tortor quis euismod. Mauris vitae hendrerit tortor, dapibus pulvinar nibh. In pellentesque viverra aliquam. Ut sed iaculis tortor. Nam maximus et nisi at pretium. Phasellus elementum velit vel nisl cursus, nec commodo justo pretium. Mauris posuere porta erat eget interdum. In at hendrerit ex, vel dapibus dolor. Ut consequat odio id ante placerat, vel dictum ligula iaculis. Nulla sit amet ligula eros. Curabitur scelerisque urna non tellus sagittis dictum. Aliquam sit amet metus facilisis, semper libero sit amet, rutrum urna. Aliquam dolor mauris, vestibulum in ante sit amet, pretium iaculis lectus. Vivamus elit tellus, elementum vel libero nec, blandit mollis augue.\n\n\n\n\n\ncookies\nrating\n\n\n\n\nchocolate chip\n8/10\n\n\npeanutbutter\n9/10\n\n\ngingerbread\n5/10\n\n\n\nMaecenas facilisis velit ut sem convallis iaculis.\\(E=m c^2\\) Vestibulum suscipit arcu pulvinar sodales commodo.\nn sed mi ut nibh convallis dapibus ac ac massa. Proin luctus metus in risus tincidunt, sed lacinia nisl tempor. \\[\\hat{H} \\Psi=i \\hbar \\frac{\\partial \\Psi}{\\partial t}\\] Sed sit amet laoreet eros.\nQuisque facilisis arcu quis ex mattis, eu hendrerit tortor rhoncus.1\nHe said\n\n“yerr”\n\n\n\n\nNature\n\n\n\n\n\nFlowers\n\n\n\n\n\n\n\npie title When to use pie chart\n\"Now\": 100\n\"Never\": 0\n\n\n\n\n\n@pyvsek2020scientists"
+  },
+  {
+    "objectID": "index.html#footnotes",
+    "href": "index.html#footnotes",
+    "title": "About Me",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nMorbi gravida scelerisque ipsum sed scelerisque.↩︎"
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "About Me",
+    "section": "Education",
+    "text": "Education\n\n2025: Georgetown University\n2023: United States Air Force Academy\n2019: East Syracuse Minoa Central Highschool"
+  },
+  {
+    "objectID": "index.html#interests",
+    "href": "index.html#interests",
+    "title": "About Me",
+    "section": "Interests",
+    "text": "Interests\n\nTravel\nSports\nMusic\nReading"
+  },
+  {
+    "objectID": "Introduction.html",
+    "href": "Introduction.html",
+    "title": "Introduction",
+    "section": "",
+    "text": "Housing Trends\nIn every aspect of life, discovering insights before others can give us a competitive advantage that will allow us to get ahead. In some activities we do, although we may know information others do not, the nature of the framework we are operating in may restrict how much utility we gain. For example, knowing the opponents next move in a game of checkers will only give us the satisfaction of winning the checkers game. However, other information is much more valuable because of the gravity of the affair in the larger scheme of life.\nShelter is a need that every human must have fulfilled. In the United States, 66% of Americans are home owners. These homeowners on average have 70% of their net worth invested into their home. Real estate can also be highly profitable for those wanting to create cash flow from owning homes or mulitifamily homes. Therefore, it is easy to see that the housing market is one area where having insights that others do not, like housing trends in a certain city, will give us a multitude of utility. I would like to buy a multifamily home after I graduate; if I knew what areas would provide me with consistent tenants and a property that goes up in value, I would be very much ahead of the game in the real estate realm and in life in general.\nIn this project, I will use census data to attempt to reveal housing trends in a certain city.\n\n\nWhat Has Already Been Done\nIn The Winners in China’s Urban Housing Reform, the researchers used census data to reveal who benefited from China’s housing reform that privatized public housing. With the census data, they were able estimate the housing subsidy received by renters in the public sector by examining private sector prices of houses of comparable quality and size. The census data contained information on six modes of housing tenure that could be compared and contained information on housing characteristics like housing space, number of bathrooms, ect. John R. Logan and Zhang (2010). Although this study has a different end goal than me, I will use the census data in a similar way to try to estimate housing prices.\nIn House Price Prediction Using Regression Techniques: A Comparative Study, the researchers attempt to forecast housing prices using different predictive techniques like multiple linear regression, LASSO, and gradient boosting among others Madhuri, Anuradha, and Pujitha (2019). I could potentially use the same techniques to accomplish my goals.\n\n\nQuestions I want to Answer\n\nWhich variable in census data reveals the most about the direction of housing prices in a certain area?\nHow do demographic trends play a role?\nDoes age have an impact?\nDoes sex have an impact?\nDoes race have an impact?\nDoes school enrollment have an impact?\nDoes migration data tell most of the story?\nHow much are home prices impacted by trends in population?\nCan we predict which areas to invest in in a certain city?\nCan we predict which areas are the best for landlords to have a steady flow of tenants?\n\n\n\n\n\n\nReferences\n\nJohn R. Logan, Yiping Fang, and Zhanxin Zhang. 2010. “The Winners in China’s Urban Housing Reform.” Housing Studies 25 (1): 101–17. https://doi.org/10.1080/02673030903240660.\n\n\nMadhuri, CH. Raga, G. Anuradha, and M. Vani Pujitha. 2019. “House Price Prediction Using Regression Techniques: A Comparative Study.” In 2019 International Conference on Smart Structures and Systems (ICSSS), 1–5. https://doi.org/10.1109/ICSSS.2019.8882834."
+  }
+]
