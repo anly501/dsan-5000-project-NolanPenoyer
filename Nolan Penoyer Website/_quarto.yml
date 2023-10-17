@@ -9,9 +9,9 @@ website:
         text: Home
       - href: Introduction.qmd
         text: Introduction
-      - href: DataGathering.qmd
+      - href: DataGathering.ipynb
         text: Data Gathering
-      - href: DataCleaning.qmd
+      - href: DataCleaning.ipynb
         text: Data Cleaning
       - href: DataExploration.qmd
         text: Data Exploration
