@@ -170,7 +170,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#python-api" id="toc-python-api" class="nav-link active" data-scroll-target="#python-api">Python API</a></li>
+  <li><a href="#r-api" id="toc-r-api" class="nav-link" data-scroll-target="#r-api">R API</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -192,111 +199,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>population_2020_URL<span class="op">=</span><span class="st">'https://api.census.gov/data/2020/dec/dhc?get=group(P1)&amp;for=county</span><span class="sc">%20s</span><span class="st">ubdivision:*&amp;in=state:51&amp;in=county:*'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>https://api.census.gov/data/2020/dec/dhc.html</p>
-<div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pop_response <span class="op">=</span> requests.get(population_2020_URL)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pop_response <span class="op">=</span> pop_response.json()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pop_df<span class="op">=</span>pd.DataFrame(pop_response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pop_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="29">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">0</th>
-<th data-quarto-table-cell-role="th">1</th>
-<th data-quarto-table-cell-role="th">2</th>
-<th data-quarto-table-cell-role="th">3</th>
-<th data-quarto-table-cell-role="th">4</th>
-<th data-quarto-table-cell-role="th">5</th>
-<th data-quarto-table-cell-role="th">6</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>GEO_ID</td>
-<td>NAME</td>
-<td>P1_001N</td>
-<td>P1_001NA</td>
-<td>state</td>
-<td>county</td>
-<td>county subdivision</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>0600000US5100991500</td>
-<td>District 3, Amherst County, Virginia</td>
-<td>6485</td>
-<td>None</td>
-<td>51</td>
-<td>009</td>
-<td>91500</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>0600000US5100791799</td>
-<td>District 5, Amelia County, Virginia</td>
-<td>2655</td>
-<td>None</td>
-<td>51</td>
-<td>007</td>
-<td>91799</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>0600000US5100991200</td>
-<td>District 1, Amherst County, Virginia</td>
-<td>6318</td>
-<td>None</td>
-<td>51</td>
-<td>009</td>
-<td>91200</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>0600000US5100991350</td>
-<td>District 2, Amherst County, Virginia</td>
-<td>6076</td>
-<td>None</td>
-<td>51</td>
-<td>009</td>
-<td>91350</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>buisness_dynamics_time_series_2021<span class="op">=</span><span class="st">'https://api.census.gov/data/timeseries/bds?get=NAME,NAICS_LABEL,YEAR,FIRM,ESTAB,EMP&amp;for=county:*&amp;in=state:51&amp;time=2021&amp;NAICS=00'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>https://api.census.gov/data/timeseries/bds.html</p>
-<div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>buisness_response <span class="op">=</span> requests.get(buisness_dynamics_time_series_2021)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>buisness_response <span class="op">=</span> buisness_response.json()</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>buisness_df<span class="op">=</span>pd.DataFrame(buisness_response)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>buisness_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="30">
+<p>I will attempt to gather all the data I need to answer my 10 questions. Most of the data I acquire will come from census.gov. I will use data tables from the U.S. Census Bureau’s American Community Survey (ACS), a nationwide survey that collects and produces information on social, economic, housing, and demographic characteristics about our nation’s population each year.</p>
+<p>I do not know how exactly I will be doing my analysis yet or what variables I think will be most useful, but to cover all my bases I will import the DP02-DP05 tables from 2017-2022, excluding 2020 because there was not accurate data that year due to COVID. I may not need all these tables or columns in the tables but it will be nice to have easy access to them in my future analysis.</p>
+<p>Here are what the ACS tables contain:<br> DP02: Selected Social Characteristics in the United States <br> DP03: Selected Economic Characteristics in the United States <br> DP04: Selected Housing Characteristics <br> DP05: ACS Demographic and Housing Estimates</p>
+<p>I decided that I just want to focus on the real estate growth potential in every state. I can start broad by going by state, then in the future I can apply this study to different geographical levels, like if I wanted to focus on one state and compare different counties or cities. The methodology will be the same. So, a state in the United States will be my observational unit.</p>
+<section id="python-api" class="level1">
+<h1>Python API</h1>
+<p>I will start by using an API in python to get one table to see what we are working with.</p>
+<div class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>DP02_URL_2017<span class="op">=</span><span class="st">"https://api.census.gov/data/2017/acs/acs1/profile?get=group(DP02)&amp;for=state:*"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>DP02_2017<span class="op">=</span> requests.get(DP02_URL_2017)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>DP02_2017 <span class="op">=</span> DP02_2017.json()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>DP02_2017<span class="op">=</span>pd.DataFrame(DP02_2017)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>DP02_2017.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="42">
 <div>
 
 
@@ -314,82 +236,177 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <th data-quarto-table-cell-role="th">7</th>
 <th data-quarto-table-cell-role="th">8</th>
 <th data-quarto-table-cell-role="th">9</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">1209</th>
+<th data-quarto-table-cell-role="th">1210</th>
+<th data-quarto-table-cell-role="th">1211</th>
+<th data-quarto-table-cell-role="th">1212</th>
+<th data-quarto-table-cell-role="th">1213</th>
+<th data-quarto-table-cell-role="th">1214</th>
+<th data-quarto-table-cell-role="th">1215</th>
+<th data-quarto-table-cell-role="th">1216</th>
+<th data-quarto-table-cell-role="th">1217</th>
+<th data-quarto-table-cell-role="th">1218</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
+<td>DP02_0001E</td>
+<td>DP02_0001EA</td>
+<td>DP02_0001M</td>
+<td>DP02_0001MA</td>
+<td>DP02_0001PE</td>
+<td>DP02_0001PEA</td>
+<td>DP02_0001PM</td>
+<td>DP02_0001PMA</td>
+<td>DP02_0002E</td>
+<td>DP02_0002EA</td>
+<td>...</td>
+<td>DP02_0152EA</td>
+<td>DP02_0152M</td>
+<td>DP02_0152MA</td>
+<td>DP02_0152PE</td>
+<td>DP02_0152PEA</td>
+<td>DP02_0152PM</td>
+<td>DP02_0152PMA</td>
+<td>GEO_ID</td>
 <td>NAME</td>
-<td>NAICS_LABEL</td>
-<td>YEAR</td>
-<td>FIRM</td>
-<td>ESTAB</td>
-<td>EMP</td>
-<td>time</td>
-<td>NAICS</td>
 <td>state</td>
-<td>county</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>Isle of Wight County, Virginia</td>
-<td>Total for all sectors</td>
-<td>2021</td>
-<td>581</td>
-<td>635</td>
-<td>9815</td>
-<td>2021</td>
-<td>00</td>
-<td>51</td>
-<td>093</td>
+<td>1091980</td>
+<td>None</td>
+<td>9693</td>
+<td>None</td>
+<td>1091980</td>
+<td>None</td>
+<td>-888888888</td>
+<td>(X)</td>
+<td>716451</td>
+<td>None</td>
+<td>...</td>
+<td>None</td>
+<td>9854</td>
+<td>None</td>
+<td>73.4</td>
+<td>None</td>
+<td>0.6</td>
+<td>None</td>
+<td>0400000US28</td>
+<td>Mississippi</td>
+<td>28</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>James City County, Virginia</td>
-<td>Total for all sectors</td>
-<td>2021</td>
-<td>1415</td>
-<td>1579</td>
-<td>24974</td>
-<td>2021</td>
-<td>00</td>
-<td>51</td>
-<td>095</td>
+<td>2385135</td>
+<td>None</td>
+<td>13054</td>
+<td>None</td>
+<td>2385135</td>
+<td>None</td>
+<td>-888888888</td>
+<td>(X)</td>
+<td>1527260</td>
+<td>None</td>
+<td>...</td>
+<td>None</td>
+<td>15052</td>
+<td>None</td>
+<td>81.3</td>
+<td>None</td>
+<td>0.4</td>
+<td>None</td>
+<td>0400000US29</td>
+<td>Missouri</td>
+<td>29</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>Russell County, Virginia</td>
-<td>Total for all sectors</td>
-<td>2021</td>
-<td>351</td>
-<td>419</td>
-<td>5801</td>
-<td>2021</td>
-<td>00</td>
-<td>51</td>
-<td>167</td>
+<td>423091</td>
+<td>None</td>
+<td>4068</td>
+<td>None</td>
+<td>423091</td>
+<td>None</td>
+<td>-888888888</td>
+<td>(X)</td>
+<td>262726</td>
+<td>None</td>
+<td>...</td>
+<td>None</td>
+<td>4698</td>
+<td>None</td>
+<td>81.3</td>
+<td>None</td>
+<td>0.9</td>
+<td>None</td>
+<td>0400000US30</td>
+<td>Montana</td>
+<td>30</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>Franklin city, Virginia</td>
-<td>Total for all sectors</td>
-<td>2021</td>
-<td>227</td>
-<td>238</td>
-<td>3725</td>
-<td>2021</td>
-<td>00</td>
-<td>51</td>
-<td>620</td>
+<td>754490</td>
+<td>None</td>
+<td>4583</td>
+<td>None</td>
+<td>754490</td>
+<td>None</td>
+<td>-888888888</td>
+<td>(X)</td>
+<td>484989</td>
+<td>None</td>
+<td>...</td>
+<td>None</td>
+<td>6206</td>
+<td>None</td>
+<td>84.4</td>
+<td>None</td>
+<td>0.5</td>
+<td>None</td>
+<td>0400000US31</td>
+<td>Nebraska</td>
+<td>31</td>
 </tr>
 </tbody>
 </table>
 
+<p>5 rows × 1219 columns</p>
 </div>
 </div>
 </div>
+<p>As you can see the column names do not tell us much right now because they are codes that match to different variable labels in the census data. For example, DP02_0001E maps to total household counts. In the data cleaning section, we will be sure to make sure each column has a proper label that tells us what the column represents. Furthermore, we will only keep a select few columns out of the large number of variables in the data cleaning section.</p>
+<p>I will use the following code to get each table I want and turn them into csvs for easy retrieval for the rest of my analysis.</p>
+<div class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>string<span class="op">=</span><span class="st">'https://api.census.gov/data/2016/acs/acs1/profile?get=group(DP05)&amp;for=state'</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>list1<span class="op">=</span>[<span class="st">'2016'</span>,<span class="st">'2017'</span>,<span class="st">'2018'</span>,<span class="st">'2019'</span>,<span class="st">'2021'</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>list2<span class="op">=</span>[<span class="st">'2017'</span>,<span class="st">'2018'</span>,<span class="st">'2019'</span>,<span class="st">'2021'</span>,<span class="st">'2022'</span>]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>list3<span class="op">=</span>[<span class="st">'DP01'</span>,<span class="st">'DP02'</span>,<span class="st">'DP03'</span>,<span class="st">'DP04'</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>list4<span class="op">=</span>[<span class="st">'DP02'</span>,<span class="st">'DP03'</span>,<span class="st">'DP04'</span>,<span class="st">'DP05'</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    string<span class="op">=</span>string.replace(<span class="st">'DP05'</span>,list3[<span class="dv">0</span>])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">file</span><span class="op">=</span><span class="st">'./data/'</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        csv<span class="op">=</span><span class="st">'.csv'</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="bu">file</span><span class="op">+</span>list2[i]<span class="op">+</span>list4[w]<span class="op">+</span>csv</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        csvname<span class="op">=</span><span class="bu">file</span><span class="op">+</span>list2[i]<span class="op">+</span>list3[w]</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        string<span class="op">=</span>string.replace(list1[i],list2[i])</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        string<span class="op">=</span>string.replace(list3[w],list4[w])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        response<span class="op">=</span>requests.get(string)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        response <span class="op">=</span> response.json()</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        df<span class="op">=</span>pd.DataFrame(response)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        df.to_csv(name, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print(string)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="r-api" class="level1">
+<h1>R API</h1>
+<p>Here I will use an API in R to retreive text data that can give me some insight into some real estate trends and what states people are talking about.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

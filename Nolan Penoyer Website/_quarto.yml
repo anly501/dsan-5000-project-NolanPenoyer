@@ -13,8 +13,10 @@ website:
         text: Data Gathering
       - href: DataCleaning.ipynb
         text: Data Cleaning
-      - href: DataExploration.qmd
+      - href: DataExploration.ipynb
         text: Data Exploration
+      - href: NaiveBayes.ipynb
+        text: NaiveBayes
       - href: Clustering.qmd
         text: Clustering
       - href: DimensionalityReduction.qmd
