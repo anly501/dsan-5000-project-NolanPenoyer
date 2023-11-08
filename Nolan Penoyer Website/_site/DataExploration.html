@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Nolan Penoyer Website – dataexploration</title>
+<title>Nolan Penoyer Website - Data Exploration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -59,6 +93,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 <link rel="stylesheet" href="styles.css">
@@ -102,6 +139,10 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Data Exploration</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./NaiveBayes.html" rel="" target="">
+ <span class="menu-text">NaiveBayes</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./Clustering.html" rel="" target="">
  <span class="menu-text">Clustering</span></a>
   </li>  
@@ -138,8 +179,1327 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Exploration</h1>
+</div>
 
 
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'./data/RecordData.csv'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">DP02_0001E</th>
+<th data-quarto-table-cell-role="th">DP02_0002E</th>
+<th data-quarto-table-cell-role="th">DP02_0003E</th>
+<th data-quarto-table-cell-role="th">DP02_0007E</th>
+<th data-quarto-table-cell-role="th">DP02_0011E</th>
+<th data-quarto-table-cell-role="th">DP02_0037E</th>
+<th data-quarto-table-cell-role="th">DP02_0060E</th>
+<th data-quarto-table-cell-role="th">DP02_0061E</th>
+<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">DP05_0001E</th>
+<th data-quarto-table-cell-role="th">DP05_0004E</th>
+<th data-quarto-table-cell-role="th">DP05_0018E</th>
+<th data-quarto-table-cell-role="th">DP05_0037E</th>
+<th data-quarto-table-cell-role="th">DP05_0038E</th>
+<th data-quarto-table-cell-role="th">DP05_0039E</th>
+<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2018</td>
+<td>0.007341</td>
+<td>0.009226</td>
+<td>-0.008186</td>
+<td>0.090413</td>
+<td>0.007228</td>
+<td>0.004783</td>
+<td>0.022710</td>
+<td>-0.002918</td>
+<td>0.018174</td>
+<td>...</td>
+<td>0.002692</td>
+<td>0.003198</td>
+<td>0.010283</td>
+<td>-0.001775</td>
+<td>-0.000327</td>
+<td>-0.123824</td>
+<td>-0.027097</td>
+<td>0.217687</td>
+<td>Alabama</td>
+<td>0.038688</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2019</td>
+<td>0.022851</td>
+<td>-0.265678</td>
+<td>-0.360479</td>
+<td>-0.317095</td>
+<td>-0.802204</td>
+<td>1.302990</td>
+<td>-0.588360</td>
+<td>-0.705200</td>
+<td>0.439418</td>
+<td>...</td>
+<td>0.003133</td>
+<td>-0.006376</td>
+<td>0.002545</td>
+<td>0.005908</td>
+<td>0.009572</td>
+<td>0.054480</td>
+<td>0.015884</td>
+<td>-0.178100</td>
+<td>Alabama</td>
+<td>0.070360</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2021</td>
+<td>0.036880</td>
+<td>0.013836</td>
+<td>0.056032</td>
+<td>-0.010988</td>
+<td>0.081890</td>
+<td>-0.050374</td>
+<td>-0.025077</td>
+<td>-0.044056</td>
+<td>0.038532</td>
+<td>...</td>
+<td>0.027878</td>
+<td>0.008556</td>
+<td>0.010152</td>
+<td>-0.013376</td>
+<td>-0.010947</td>
+<td>0.067268</td>
+<td>0.040587</td>
+<td>-0.005625</td>
+<td>Alabama</td>
+<td>0.263465</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2022</td>
+<td>0.024848</td>
+<td>0.041137</td>
+<td>0.053954</td>
+<td>-0.058821</td>
+<td>0.009307</td>
+<td>0.106362</td>
+<td>-0.070979</td>
+<td>-0.062720</td>
+<td>-0.020504</td>
+<td>...</td>
+<td>0.006829</td>
+<td>-0.001060</td>
+<td>-0.005025</td>
+<td>0.006291</td>
+<td>-0.002353</td>
+<td>-0.017318</td>
+<td>0.146484</td>
+<td>10.243876</td>
+<td>Alabama</td>
+<td>0.076587</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2018</td>
+<td>0.015195</td>
+<td>0.000753</td>
+<td>-0.043082</td>
+<td>-0.078405</td>
+<td>0.043289</td>
+<td>0.942898</td>
+<td>-0.208181</td>
+<td>0.031255</td>
+<td>0.017837</td>
+<td>...</td>
+<td>-0.003186</td>
+<td>-0.009174</td>
+<td>0.011594</td>
+<td>-0.000634</td>
+<td>0.139775</td>
+<td>0.012942</td>
+<td>-0.060828</td>
+<td>0.054155</td>
+<td>Alaska</td>
+<td>0.005789</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 34 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">DP02_0001E</th>
+<th data-quarto-table-cell-role="th">DP02_0002E</th>
+<th data-quarto-table-cell-role="th">DP02_0003E</th>
+<th data-quarto-table-cell-role="th">DP02_0007E</th>
+<th data-quarto-table-cell-role="th">DP02_0011E</th>
+<th data-quarto-table-cell-role="th">DP02_0037E</th>
+<th data-quarto-table-cell-role="th">DP02_0060E</th>
+<th data-quarto-table-cell-role="th">DP02_0061E</th>
+<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">DP04_0134E</th>
+<th data-quarto-table-cell-role="th">DP05_0001E</th>
+<th data-quarto-table-cell-role="th">DP05_0004E</th>
+<th data-quarto-table-cell-role="th">DP05_0018E</th>
+<th data-quarto-table-cell-role="th">DP05_0037E</th>
+<th data-quarto-table-cell-role="th">DP05_0038E</th>
+<th data-quarto-table-cell-role="th">DP05_0039E</th>
+<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>...</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>2020.000000</td>
+<td>0.020044</td>
+<td>-0.050633</td>
+<td>-0.069625</td>
+<td>-0.089833</td>
+<td>-0.206925</td>
+<td>0.524127</td>
+<td>-0.109497</td>
+<td>-0.220982</td>
+<td>0.093385</td>
+<td>...</td>
+<td>0.056447</td>
+<td>0.006469</td>
+<td>0.002941</td>
+<td>0.005769</td>
+<td>-0.021826</td>
+<td>0.001579</td>
+<td>0.059462</td>
+<td>0.019590</td>
+<td>4.530851</td>
+<td>0.110084</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>1.585028</td>
+<td>0.017131</td>
+<td>0.120031</td>
+<td>0.157685</td>
+<td>0.232427</td>
+<td>0.365501</td>
+<td>0.945060</td>
+<td>0.198461</td>
+<td>0.329615</td>
+<td>0.215643</td>
+<td>...</td>
+<td>0.033730</td>
+<td>0.010885</td>
+<td>0.007600</td>
+<td>0.005859</td>
+<td>0.059540</td>
+<td>0.112276</td>
+<td>0.268675</td>
+<td>0.078313</td>
+<td>11.884183</td>
+<td>0.099373</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>2018.000000</td>
+<td>-0.009240</td>
+<td>-0.355454</td>
+<td>-0.490505</td>
+<td>-0.554143</td>
+<td>-0.888434</td>
+<td>-0.346730</td>
+<td>-0.656774</td>
+<td>-0.870279</td>
+<td>-0.112117</td>
+<td>...</td>
+<td>-0.019983</td>
+<td>-0.050583</td>
+<td>-0.020735</td>
+<td>-0.010390</td>
+<td>-0.383837</td>
+<td>-0.387319</td>
+<td>-0.578552</td>
+<td>-0.274559</td>
+<td>-0.451586</td>
+<td>-0.016960</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>2018.750000</td>
+<td>0.009339</td>
+<td>-0.065194</td>
+<td>-0.128874</td>
+<td>-0.290981</td>
+<td>-0.361259</td>
+<td>-0.017399</td>
+<td>-0.161193</td>
+<td>-0.355393</td>
+<td>-0.013111</td>
+<td>...</td>
+<td>0.031688</td>
+<td>-0.000028</td>
+<td>-0.001061</td>
+<td>0.002532</td>
+<td>-0.017285</td>
+<td>-0.032278</td>
+<td>-0.078743</td>
+<td>-0.013964</td>
+<td>-0.009074</td>
+<td>0.049067</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>2020.000000</td>
+<td>0.016837</td>
+<td>0.004610</td>
+<td>-0.002334</td>
+<td>-0.026105</td>
+<td>-0.022791</td>
+<td>0.063992</td>
+<td>-0.047421</td>
+<td>-0.056749</td>
+<td>0.005985</td>
+<td>...</td>
+<td>0.052233</td>
+<td>0.004786</td>
+<td>0.002001</td>
+<td>0.005263</td>
+<td>-0.001994</td>
+<td>0.004109</td>
+<td>0.025383</td>
+<td>0.017288</td>
+<td>0.078421</td>
+<td>0.066658</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>2021.250000</td>
+<td>0.025940</td>
+<td>0.021921</td>
+<td>0.030698</td>
+<td>0.047844</td>
+<td>0.020779</td>
+<td>0.951449</td>
+<td>0.011528</td>
+<td>-0.004048</td>
+<td>0.052998</td>
+<td>...</td>
+<td>0.078260</td>
+<td>0.012023</td>
+<td>0.007316</td>
+<td>0.008433</td>
+<td>0.004153</td>
+<td>0.026074</td>
+<td>0.104096</td>
+<td>0.049673</td>
+<td>1.078422</td>
+<td>0.135000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>2022.000000</td>
+<td>0.096015</td>
+<td>0.083260</td>
+<td>0.210279</td>
+<td>0.571831</td>
+<td>0.310981</td>
+<td>4.711793</td>
+<td>0.583672</td>
+<td>0.233134</td>
+<td>1.166320</td>
+<td>...</td>
+<td>0.176136</td>
+<td>0.063712</td>
+<td>0.024341</td>
+<td>0.026667</td>
+<td>0.042915</td>
+<td>0.940551</td>
+<td>1.598558</td>
+<td>0.394246</td>
+<td>85.273260</td>
+<td>0.576048</td>
+</tr>
+</tbody>
+</table>
+
+<p>8 rows × 33 columns</p>
+</div>
+</div>
+</div>
+<p>As you can see there may be some problematic columns that we may not want to use in our analysis. For now lest drop the DP05_0073E as the standard deviation is very high which may indicate incorrectly measured data.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>df.drop(<span class="st">'DP05_0073E'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Alabama_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'Alabama'</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'Typical Home Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value in Alabama"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Typical Home Value Percent Change"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'DP03_0026PE'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in Alabama"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>NewYork_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'New York'</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'Typical Home Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value in New York"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Typical Home Value Percent Change"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'DP03_0026PE'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in NewYork"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Michigan_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'Michigan'</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'Typical Home Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value in Michigan"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Typical Home Value Percent Change"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'DP03_0026PE'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in NewYork"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'DP02_0062E'</span>]])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plots of Goals For Highschool Graduate Changes'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'DP04_0002E'</span>]])</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plots of Goals For Occupied Housing Units Changes'</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'DP05_0001E'</span>]])</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plots of Goals For Total Population Changes'</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>A lot of Outliers</p>
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df2<span class="op">=</span>df.drop([<span class="st">'Year'</span>,<span class="st">'RegionName'</span>],axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df2.corr()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">DP02_0001E</th>
+<th data-quarto-table-cell-role="th">DP02_0002E</th>
+<th data-quarto-table-cell-role="th">DP02_0003E</th>
+<th data-quarto-table-cell-role="th">DP02_0007E</th>
+<th data-quarto-table-cell-role="th">DP02_0011E</th>
+<th data-quarto-table-cell-role="th">DP02_0037E</th>
+<th data-quarto-table-cell-role="th">DP02_0060E</th>
+<th data-quarto-table-cell-role="th">DP02_0061E</th>
+<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">DP02_0063E</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">DP04_0047E</th>
+<th data-quarto-table-cell-role="th">DP04_0134E</th>
+<th data-quarto-table-cell-role="th">DP05_0001E</th>
+<th data-quarto-table-cell-role="th">DP05_0004E</th>
+<th data-quarto-table-cell-role="th">DP05_0018E</th>
+<th data-quarto-table-cell-role="th">DP05_0037E</th>
+<th data-quarto-table-cell-role="th">DP05_0038E</th>
+<th data-quarto-table-cell-role="th">DP05_0039E</th>
+<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP02_0001E</td>
+<td>1.000000</td>
+<td>0.438800</td>
+<td>0.465624</td>
+<td>0.248086</td>
+<td>0.336708</td>
+<td>-0.260457</td>
+<td>0.312382</td>
+<td>0.287555</td>
+<td>-0.294137</td>
+<td>-0.318927</td>
+<td>...</td>
+<td>0.368283</td>
+<td>0.421822</td>
+<td>0.390172</td>
+<td>0.331799</td>
+<td>0.277745</td>
+<td>-0.536511</td>
+<td>-0.153728</td>
+<td>0.009718</td>
+<td>0.049971</td>
+<td>0.578869</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP02_0002E</td>
+<td>0.438800</td>
+<td>1.000000</td>
+<td>0.981878</td>
+<td>0.790430</td>
+<td>0.945954</td>
+<td>-0.831271</td>
+<td>0.757746</td>
+<td>0.931202</td>
+<td>-0.766019</td>
+<td>-0.920144</td>
+<td>...</td>
+<td>0.063216</td>
+<td>0.497780</td>
+<td>0.276947</td>
+<td>0.331144</td>
+<td>0.021856</td>
+<td>-0.274077</td>
+<td>-0.166218</td>
+<td>0.019215</td>
+<td>0.078385</td>
+<td>0.444488</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP02_0003E</td>
+<td>0.465624</td>
+<td>0.981878</td>
+<td>1.000000</td>
+<td>0.771685</td>
+<td>0.943687</td>
+<td>-0.815491</td>
+<td>0.781559</td>
+<td>0.917415</td>
+<td>-0.774410</td>
+<td>-0.906359</td>
+<td>...</td>
+<td>0.090782</td>
+<td>0.499087</td>
+<td>0.241894</td>
+<td>0.325107</td>
+<td>0.017160</td>
+<td>-0.278718</td>
+<td>-0.198401</td>
+<td>-0.003718</td>
+<td>0.081323</td>
+<td>0.447811</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP02_0007E</td>
+<td>0.248086</td>
+<td>0.790430</td>
+<td>0.771685</td>
+<td>1.000000</td>
+<td>0.797750</td>
+<td>-0.742020</td>
+<td>0.682252</td>
+<td>0.800932</td>
+<td>-0.621534</td>
+<td>-0.745090</td>
+<td>...</td>
+<td>0.093202</td>
+<td>0.412152</td>
+<td>0.194073</td>
+<td>0.243893</td>
+<td>0.024614</td>
+<td>-0.212158</td>
+<td>-0.045523</td>
+<td>0.056621</td>
+<td>0.111638</td>
+<td>0.364732</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP02_0011E</td>
+<td>0.336708</td>
+<td>0.945954</td>
+<td>0.943687</td>
+<td>0.797750</td>
+<td>1.000000</td>
+<td>-0.894087</td>
+<td>0.803087</td>
+<td>0.972320</td>
+<td>-0.749640</td>
+<td>-0.896076</td>
+<td>...</td>
+<td>0.093006</td>
+<td>0.438733</td>
+<td>0.151822</td>
+<td>0.228283</td>
+<td>0.085614</td>
+<td>-0.219316</td>
+<td>-0.214236</td>
+<td>0.019388</td>
+<td>0.115063</td>
+<td>0.338099</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP02_0037E</td>
+<td>-0.260457</td>
+<td>-0.831271</td>
+<td>-0.815491</td>
+<td>-0.742020</td>
+<td>-0.894087</td>
+<td>1.000000</td>
+<td>-0.711113</td>
+<td>-0.893892</td>
+<td>0.592598</td>
+<td>0.785771</td>
+<td>...</td>
+<td>-0.040640</td>
+<td>-0.411501</td>
+<td>-0.118924</td>
+<td>-0.275845</td>
+<td>-0.072924</td>
+<td>0.213962</td>
+<td>0.149411</td>
+<td>-0.005464</td>
+<td>-0.171662</td>
+<td>-0.327840</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP02_0060E</td>
+<td>0.312382</td>
+<td>0.757746</td>
+<td>0.781559</td>
+<td>0.682252</td>
+<td>0.803087</td>
+<td>-0.711113</td>
+<td>1.000000</td>
+<td>0.782436</td>
+<td>-0.655789</td>
+<td>-0.724942</td>
+<td>...</td>
+<td>0.135533</td>
+<td>0.460252</td>
+<td>0.192067</td>
+<td>0.237910</td>
+<td>0.159691</td>
+<td>-0.212471</td>
+<td>-0.298075</td>
+<td>0.009762</td>
+<td>0.029356</td>
+<td>0.297504</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP02_0061E</td>
+<td>0.287555</td>
+<td>0.931202</td>
+<td>0.917415</td>
+<td>0.800932</td>
+<td>0.972320</td>
+<td>-0.893892</td>
+<td>0.782436</td>
+<td>1.000000</td>
+<td>-0.752483</td>
+<td>-0.875352</td>
+<td>...</td>
+<td>0.109633</td>
+<td>0.424624</td>
+<td>0.179373</td>
+<td>0.191868</td>
+<td>0.090643</td>
+<td>-0.152399</td>
+<td>-0.195105</td>
+<td>0.055358</td>
+<td>0.137906</td>
+<td>0.290155</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP02_0062E</td>
+<td>-0.294137</td>
+<td>-0.766019</td>
+<td>-0.774410</td>
+<td>-0.621534</td>
+<td>-0.749640</td>
+<td>0.592598</td>
+<td>-0.655789</td>
+<td>-0.752483</td>
+<td>1.000000</td>
+<td>0.625286</td>
+<td>...</td>
+<td>-0.004732</td>
+<td>-0.423344</td>
+<td>-0.185994</td>
+<td>-0.201587</td>
+<td>-0.058643</td>
+<td>0.172882</td>
+<td>0.132303</td>
+<td>0.004590</td>
+<td>-0.111726</td>
+<td>-0.296042</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP02_0063E</td>
+<td>-0.318927</td>
+<td>-0.920144</td>
+<td>-0.906359</td>
+<td>-0.745090</td>
+<td>-0.896076</td>
+<td>0.785771</td>
+<td>-0.724942</td>
+<td>-0.875352</td>
+<td>0.625286</td>
+<td>1.000000</td>
+<td>...</td>
+<td>-0.068992</td>
+<td>-0.410235</td>
+<td>-0.127849</td>
+<td>-0.290762</td>
+<td>-0.002780</td>
+<td>0.222860</td>
+<td>0.165423</td>
+<td>-0.042741</td>
+<td>-0.026843</td>
+<td>-0.339538</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP02_0064E</td>
+<td>0.317707</td>
+<td>0.947215</td>
+<td>0.930499</td>
+<td>0.808561</td>
+<td>0.954101</td>
+<td>-0.873807</td>
+<td>0.742061</td>
+<td>0.942365</td>
+<td>-0.734199</td>
+<td>-0.921569</td>
+<td>...</td>
+<td>0.041452</td>
+<td>0.421006</td>
+<td>0.202411</td>
+<td>0.261304</td>
+<td>0.052382</td>
+<td>-0.213265</td>
+<td>-0.163936</td>
+<td>0.034185</td>
+<td>0.103434</td>
+<td>0.368901</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP02_0065E</td>
+<td>-0.212064</td>
+<td>-0.779303</td>
+<td>-0.778599</td>
+<td>-0.715225</td>
+<td>-0.855243</td>
+<td>0.855915</td>
+<td>-0.739918</td>
+<td>-0.865743</td>
+<td>0.584652</td>
+<td>0.712947</td>
+<td>...</td>
+<td>-0.078217</td>
+<td>-0.360112</td>
+<td>-0.060273</td>
+<td>-0.220864</td>
+<td>-0.049123</td>
+<td>0.183743</td>
+<td>0.210422</td>
+<td>-0.048662</td>
+<td>-0.174529</td>
+<td>-0.245080</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP03_0026PE</td>
+<td>-0.164870</td>
+<td>-0.003424</td>
+<td>-0.035541</td>
+<td>0.058006</td>
+<td>0.031240</td>
+<td>0.019247</td>
+<td>0.050115</td>
+<td>0.095316</td>
+<td>-0.012144</td>
+<td>0.016294</td>
+<td>...</td>
+<td>0.197981</td>
+<td>0.180419</td>
+<td>0.199823</td>
+<td>-0.381214</td>
+<td>-0.100719</td>
+<td>0.501511</td>
+<td>0.082050</td>
+<td>0.009338</td>
+<td>0.120333</td>
+<td>-0.247353</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP03_0005E</td>
+<td>0.474298</td>
+<td>0.179621</td>
+<td>0.192406</td>
+<td>0.019238</td>
+<td>0.081436</td>
+<td>-0.064336</td>
+<td>0.111410</td>
+<td>0.031265</td>
+<td>-0.108437</td>
+<td>-0.100239</td>
+<td>...</td>
+<td>-0.192926</td>
+<td>0.128883</td>
+<td>0.342345</td>
+<td>0.444477</td>
+<td>0.206341</td>
+<td>-0.617429</td>
+<td>-0.175998</td>
+<td>0.068743</td>
+<td>-0.036782</td>
+<td>0.549155</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP03_0062E</td>
+<td>-0.024458</td>
+<td>-0.004581</td>
+<td>-0.021028</td>
+<td>-0.010217</td>
+<td>-0.068167</td>
+<td>0.019591</td>
+<td>-0.012365</td>
+<td>-0.070054</td>
+<td>0.021158</td>
+<td>0.063929</td>
+<td>...</td>
+<td>-0.274300</td>
+<td>0.437673</td>
+<td>0.252681</td>
+<td>0.059726</td>
+<td>-0.224007</td>
+<td>0.052497</td>
+<td>-0.076748</td>
+<td>-0.040125</td>
+<td>0.118803</td>
+<td>0.242465</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP03_0063E</td>
+<td>0.129516</td>
+<td>0.169651</td>
+<td>0.165921</td>
+<td>0.104215</td>
+<td>0.115443</td>
+<td>-0.128515</td>
+<td>0.078931</td>
+<td>0.114442</td>
+<td>-0.101892</td>
+<td>-0.098668</td>
+<td>...</td>
+<td>-0.134462</td>
+<td>0.542114</td>
+<td>0.318451</td>
+<td>0.082443</td>
+<td>-0.122832</td>
+<td>-0.061203</td>
+<td>-0.164692</td>
+<td>-0.135585</td>
+<td>0.213101</td>
+<td>0.450604</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP03_0093E</td>
+<td>0.521425</td>
+<td>0.358641</td>
+<td>0.380646</td>
+<td>0.239736</td>
+<td>0.267579</td>
+<td>-0.248847</td>
+<td>0.222373</td>
+<td>0.209678</td>
+<td>-0.291935</td>
+<td>-0.254937</td>
+<td>...</td>
+<td>-0.165930</td>
+<td>0.402790</td>
+<td>0.242736</td>
+<td>0.490989</td>
+<td>0.080710</td>
+<td>-0.520318</td>
+<td>-0.167742</td>
+<td>-0.061886</td>
+<td>0.058246</td>
+<td>0.613716</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP03_0094E</td>
+<td>0.527228</td>
+<td>0.396203</td>
+<td>0.417353</td>
+<td>0.297018</td>
+<td>0.314391</td>
+<td>-0.319496</td>
+<td>0.320358</td>
+<td>0.255450</td>
+<td>-0.255274</td>
+<td>-0.341490</td>
+<td>...</td>
+<td>-0.106647</td>
+<td>0.449579</td>
+<td>0.233298</td>
+<td>0.499738</td>
+<td>0.025937</td>
+<td>-0.598228</td>
+<td>-0.333074</td>
+<td>-0.037168</td>
+<td>-0.015659</td>
+<td>0.681039</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP04_0002E</td>
+<td>1.000000</td>
+<td>0.438800</td>
+<td>0.465624</td>
+<td>0.248086</td>
+<td>0.336708</td>
+<td>-0.260457</td>
+<td>0.312382</td>
+<td>0.287555</td>
+<td>-0.294137</td>
+<td>-0.318927</td>
+<td>...</td>
+<td>0.368283</td>
+<td>0.421822</td>
+<td>0.390172</td>
+<td>0.331799</td>
+<td>0.277745</td>
+<td>-0.536511</td>
+<td>-0.153728</td>
+<td>0.009718</td>
+<td>0.049971</td>
+<td>0.578869</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP04_0001E</td>
+<td>0.686693</td>
+<td>0.172911</td>
+<td>0.203209</td>
+<td>0.019719</td>
+<td>0.110703</td>
+<td>-0.051470</td>
+<td>0.155896</td>
+<td>0.083528</td>
+<td>-0.148170</td>
+<td>-0.090230</td>
+<td>...</td>
+<td>0.372963</td>
+<td>0.229018</td>
+<td>0.221057</td>
+<td>0.102697</td>
+<td>0.222890</td>
+<td>-0.283962</td>
+<td>0.003257</td>
+<td>0.108058</td>
+<td>0.029278</td>
+<td>0.208816</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP04_0037E</td>
+<td>0.196957</td>
+<td>0.217412</td>
+<td>0.214178</td>
+<td>0.151148</td>
+<td>0.150782</td>
+<td>-0.132356</td>
+<td>0.065169</td>
+<td>0.121083</td>
+<td>-0.129029</td>
+<td>-0.188487</td>
+<td>...</td>
+<td>-0.247484</td>
+<td>0.135262</td>
+<td>0.309887</td>
+<td>0.268522</td>
+<td>0.065965</td>
+<td>-0.321603</td>
+<td>-0.235029</td>
+<td>-0.039576</td>
+<td>0.070796</td>
+<td>0.502435</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP04_0047E</td>
+<td>0.368283</td>
+<td>0.063216</td>
+<td>0.090782</td>
+<td>0.093202</td>
+<td>0.093006</td>
+<td>-0.040640</td>
+<td>0.135533</td>
+<td>0.109633</td>
+<td>-0.004732</td>
+<td>-0.068992</td>
+<td>...</td>
+<td>1.000000</td>
+<td>0.088938</td>
+<td>-0.028178</td>
+<td>-0.058786</td>
+<td>0.149449</td>
+<td>0.031237</td>
+<td>0.027316</td>
+<td>0.028427</td>
+<td>0.026458</td>
+<td>-0.124036</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP04_0134E</td>
+<td>0.421822</td>
+<td>0.497780</td>
+<td>0.499087</td>
+<td>0.412152</td>
+<td>0.438733</td>
+<td>-0.411501</td>
+<td>0.460252</td>
+<td>0.424624</td>
+<td>-0.423344</td>
+<td>-0.410235</td>
+<td>...</td>
+<td>0.088938</td>
+<td>1.000000</td>
+<td>0.420228</td>
+<td>0.334809</td>
+<td>-0.060136</td>
+<td>-0.268605</td>
+<td>-0.180041</td>
+<td>-0.021600</td>
+<td>0.112019</td>
+<td>0.570452</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP05_0001E</td>
+<td>0.390172</td>
+<td>0.276947</td>
+<td>0.241894</td>
+<td>0.194073</td>
+<td>0.151822</td>
+<td>-0.118924</td>
+<td>0.192067</td>
+<td>0.179373</td>
+<td>-0.185994</td>
+<td>-0.127849</td>
+<td>...</td>
+<td>-0.028178</td>
+<td>0.420228</td>
+<td>1.000000</td>
+<td>0.216560</td>
+<td>-0.059961</td>
+<td>-0.053172</td>
+<td>-0.080334</td>
+<td>0.018665</td>
+<td>0.225440</td>
+<td>0.544573</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP05_0004E</td>
+<td>0.331799</td>
+<td>0.331144</td>
+<td>0.325107</td>
+<td>0.243893</td>
+<td>0.228283</td>
+<td>-0.275845</td>
+<td>0.237910</td>
+<td>0.191868</td>
+<td>-0.201587</td>
+<td>-0.290762</td>
+<td>...</td>
+<td>-0.058786</td>
+<td>0.334809</td>
+<td>0.216560</td>
+<td>1.000000</td>
+<td>-0.016104</td>
+<td>-0.420289</td>
+<td>-0.006381</td>
+<td>-0.009656</td>
+<td>-0.131272</td>
+<td>0.539996</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP05_0018E</td>
+<td>0.277745</td>
+<td>0.021856</td>
+<td>0.017160</td>
+<td>0.024614</td>
+<td>0.085614</td>
+<td>-0.072924</td>
+<td>0.159691</td>
+<td>0.090643</td>
+<td>-0.058643</td>
+<td>-0.002780</td>
+<td>...</td>
+<td>0.149449</td>
+<td>-0.060136</td>
+<td>-0.059961</td>
+<td>-0.016104</td>
+<td>1.000000</td>
+<td>-0.230943</td>
+<td>-0.119643</td>
+<td>0.039093</td>
+<td>0.032161</td>
+<td>0.028251</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP05_0037E</td>
+<td>-0.536511</td>
+<td>-0.274077</td>
+<td>-0.278718</td>
+<td>-0.212158</td>
+<td>-0.219316</td>
+<td>0.213962</td>
+<td>-0.212471</td>
+<td>-0.152399</td>
+<td>0.172882</td>
+<td>0.222860</td>
+<td>...</td>
+<td>0.031237</td>
+<td>-0.268605</td>
+<td>-0.053172</td>
+<td>-0.420289</td>
+<td>-0.230943</td>
+<td>1.000000</td>
+<td>0.168399</td>
+<td>-0.169048</td>
+<td>0.027705</td>
+<td>-0.589996</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP05_0038E</td>
+<td>-0.153728</td>
+<td>-0.166218</td>
+<td>-0.198401</td>
+<td>-0.045523</td>
+<td>-0.214236</td>
+<td>0.149411</td>
+<td>-0.298075</td>
+<td>-0.195105</td>
+<td>0.132303</td>
+<td>0.165423</td>
+<td>...</td>
+<td>0.027316</td>
+<td>-0.180041</td>
+<td>-0.080334</td>
+<td>-0.006381</td>
+<td>-0.119643</td>
+<td>0.168399</td>
+<td>1.000000</td>
+<td>0.039821</td>
+<td>-0.071010</td>
+<td>-0.254423</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">DP05_0039E</td>
+<td>0.009718</td>
+<td>0.019215</td>
+<td>-0.003718</td>
+<td>0.056621</td>
+<td>0.019388</td>
+<td>-0.005464</td>
+<td>0.009762</td>
+<td>0.055358</td>
+<td>0.004590</td>
+<td>-0.042741</td>
+<td>...</td>
+<td>0.028427</td>
+<td>-0.021600</td>
+<td>0.018665</td>
+<td>-0.009656</td>
+<td>0.039093</td>
+<td>-0.169048</td>
+<td>0.039821</td>
+<td>1.000000</td>
+<td>-0.060736</td>
+<td>-0.066153</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">DP05_0044E</td>
+<td>0.049971</td>
+<td>0.078385</td>
+<td>0.081323</td>
+<td>0.111638</td>
+<td>0.115063</td>
+<td>-0.171662</td>
+<td>0.029356</td>
+<td>0.137906</td>
+<td>-0.111726</td>
+<td>-0.026843</td>
+<td>...</td>
+<td>0.026458</td>
+<td>0.112019</td>
+<td>0.225440</td>
+<td>-0.131272</td>
+<td>0.032161</td>
+<td>0.027705</td>
+<td>-0.071010</td>
+<td>-0.060736</td>
+<td>1.000000</td>
+<td>0.079361</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Typical Home Value</td>
+<td>0.578869</td>
+<td>0.444488</td>
+<td>0.447811</td>
+<td>0.364732</td>
+<td>0.338099</td>
+<td>-0.327840</td>
+<td>0.297504</td>
+<td>0.290155</td>
+<td>-0.296042</td>
+<td>-0.339538</td>
+<td>...</td>
+<td>-0.124036</td>
+<td>0.570452</td>
+<td>0.544573</td>
+<td>0.539996</td>
+<td>0.028251</td>
+<td>-0.589996</td>
+<td>-0.254423</td>
+<td>-0.066153</td>
+<td>0.079361</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+<p>31 rows × 31 columns</p>
+</div>
+</div>
+</div>
 
 
 

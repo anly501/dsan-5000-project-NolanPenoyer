@@ -139,6 +139,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Data Exploration</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./NaiveBayes.html" rel="" target="">
+ <span class="menu-text">NaiveBayes</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./Clustering.html" rel="" target="">
  <span class="menu-text">Clustering</span></a>
   </li>  
@@ -199,15 +203,123 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>I clean all the data here so I can begin to do analysis and try to build some useful models. I’ll start by reading in a csv, selecting some columns, and changing the column names.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>DP02cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP02_0001E'</span>,<span class="st">'DP02_0002E'</span>,<span class="st">'DP02_0003E'</span>,<span class="st">'DP02_0007E'</span>,<span class="st">'DP02_0011E'</span>,<span class="st">'DP02_0037E'</span>,<span class="st">'DP02_0060E'</span>,<span class="st">'DP02_0061E'</span>,<span class="st">'DP02_0062E'</span>,<span class="st">'DP02_0063E'</span>,<span class="st">'DP02_0064E'</span>,<span class="st">'DP02_0065E'</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>DP03cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP03_0026PE'</span>,<span class="st">'DP03_0005E'</span>,<span class="st">'DP03_0062E'</span>,<span class="st">'DP03_0063E'</span>,<span class="st">'DP03_0093E'</span>,<span class="st">'DP03_0094E'</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>DP04cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP04_0002E'</span>,<span class="st">'DP04_0001E'</span>,<span class="st">'DP04_0037E'</span>,<span class="st">'DP04_0047E'</span>,<span class="st">'DP04_0134E'</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>DP05cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP05_0001E'</span>,<span class="st">'DP05_0004E'</span>,<span class="st">'DP05_0018E'</span>,<span class="st">'DP05_0037E'</span>,<span class="st">'DP05_0038E'</span>,<span class="st">'DP05_0039E'</span>,<span class="st">'DP05_0044E'</span>,<span class="st">'DP05_0073E'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>DP0217<span class="op">=</span>pd.read_csv(<span class="st">'data/2017DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>DP0218<span class="op">=</span>pd.read_csv(<span class="st">'data/2018DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>DP0219<span class="op">=</span>pd.read_csv(<span class="st">'data/2019DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>DP0221<span class="op">=</span>pd.read_csv(<span class="st">'data/2021DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>DP0222<span class="op">=</span>pd.read_csv(<span class="st">'data/2022DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>DP0317 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>DP0318 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>DP0319 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>DP0321 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>DP0322 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>DP0417 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>DP0418 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>DP0419 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>DP0421 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>DP0422 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>DP0517 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>DP0518 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>DP0519 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>DP0521 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>DP0522 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>economic2022<span class="op">=</span>pd.read_csv(<span class="st">'./data/2022DP05.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DP0217<span class="op">=</span>DP0217[DP02cols]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>DP0217[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2017</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>DP0218<span class="op">=</span>DP0218[DP02cols]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>DP0218[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2018</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>DP0219<span class="op">=</span>DP0219[DP02cols]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>DP0219[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2019</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>DP0221<span class="op">=</span>DP0221[DP02cols]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>DP0221[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2021</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>DP0222<span class="op">=</span>DP0222[DP02cols]</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>DP0222[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2022</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>DP0317 <span class="op">=</span> DP0317[DP03cols]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>DP0318 <span class="op">=</span> DP0318[DP03cols]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>DP0319 <span class="op">=</span> DP0319[DP03cols]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>DP0321 <span class="op">=</span> DP0321[DP03cols]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>DP0322 <span class="op">=</span> DP0322[DP03cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>DP0417 <span class="op">=</span> DP0417[DP04cols]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>DP0418 <span class="op">=</span> DP0418[DP04cols]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>DP0419 <span class="op">=</span> DP0419[DP04cols]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>DP0421 <span class="op">=</span> DP0421[DP04cols]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>DP0422 <span class="op">=</span> DP0422[DP04cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>economic2022<span class="op">=</span>economic2022.reset_index(drop<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>DP0517 <span class="op">=</span> DP0517[DP05cols]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>DP0518 <span class="op">=</span> DP0518[DP05cols]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>DP0519 <span class="op">=</span> DP0519[DP05cols]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>DP0521 <span class="op">=</span> DP0521[DP05cols]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>DP0522 <span class="op">=</span> DP0522[DP05cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(DP0217,DP0317,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(df2017,DP0417,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(df2017,DP0517,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(DP0218,DP0318,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(df2018,DP0418,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(df2018,DP0518,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(DP0219,DP0319,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(df2019,DP0419,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(df2019,DP0519,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(DP0221,DP0321,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(df2021,DP0421,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(df2021,DP0521,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(DP0222,DP0322,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(df2022,DP0422,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(df2022,DP0522,on<span class="op">=</span><span class="st">'NAME'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>us_states <span class="op">=</span> [</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Alabama"</span>, <span class="st">"Alaska"</span>, <span class="st">"Arizona"</span>, <span class="st">"Arkansas"</span>, <span class="st">"California"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Colorado"</span>, <span class="st">"Connecticut"</span>, <span class="st">"Delaware"</span>, <span class="st">"Florida"</span>, <span class="st">"Georgia"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hawaii"</span>, <span class="st">"Idaho"</span>, <span class="st">"Illinois"</span>, <span class="st">"Indiana"</span>, <span class="st">"Iowa"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Kansas"</span>, <span class="st">"Kentucky"</span>, <span class="st">"Louisiana"</span>, <span class="st">"Maine"</span>, <span class="st">"Maryland"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Massachusetts"</span>, <span class="st">"Michigan"</span>, <span class="st">"Minnesota"</span>, <span class="st">"Mississippi"</span>, <span class="st">"Missouri"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Montana"</span>, <span class="st">"Nebraska"</span>, <span class="st">"Nevada"</span>, <span class="st">"New Hampshire"</span>, <span class="st">"New Jersey"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"New Mexico"</span>, <span class="st">"New York"</span>, <span class="st">"North Carolina"</span>, <span class="st">"North Dakota"</span>, <span class="st">"Ohio"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Oklahoma"</span>, <span class="st">"Oregon"</span>, <span class="st">"Pennsylvania"</span>, <span class="st">"Rhode Island"</span>, <span class="st">"South Carolina"</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"South Dakota"</span>, <span class="st">"Tennessee"</span>, <span class="st">"Texas"</span>, <span class="st">"Utah"</span>, <span class="st">"Vermont"</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Virginia"</span>, <span class="st">"Washington"</span>, <span class="st">"West Virginia"</span>, <span class="st">"Wisconsin"</span>, <span class="st">"Wyoming"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"District of Columbia"</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>feature_df<span class="op">=</span>pd.DataFrame()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>economic2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> state <span class="kw">in</span> us_states:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    row1<span class="op">=</span>df2017[df2017[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    row2<span class="op">=</span>df2018[df2018[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    row3<span class="op">=</span>df2019[df2019[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    row4<span class="op">=</span>df2021[df2021[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    row5<span class="op">=</span>df2022[df2022[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>pd.concat([row1,row2,row3,row4,row5])</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.drop(<span class="st">'NAME'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.set_index(<span class="st">'Year'</span>).pct_change().reset_index()</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'RegionName'</span>]<span class="op">=</span>state</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    feature_df<span class="op">=</span>pd.concat([feature_df,df])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>feature_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 
@@ -215,1316 +327,318 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">0</th>
-<th data-quarto-table-cell-role="th">1</th>
-<th data-quarto-table-cell-role="th">2</th>
-<th data-quarto-table-cell-role="th">3</th>
-<th data-quarto-table-cell-role="th">4</th>
-<th data-quarto-table-cell-role="th">5</th>
-<th data-quarto-table-cell-role="th">6</th>
-<th data-quarto-table-cell-role="th">7</th>
-<th data-quarto-table-cell-role="th">8</th>
-<th data-quarto-table-cell-role="th">9</th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">DP02_0001E</th>
+<th data-quarto-table-cell-role="th">DP02_0002E</th>
+<th data-quarto-table-cell-role="th">DP02_0003E</th>
+<th data-quarto-table-cell-role="th">DP02_0007E</th>
+<th data-quarto-table-cell-role="th">DP02_0011E</th>
+<th data-quarto-table-cell-role="th">DP02_0037E</th>
+<th data-quarto-table-cell-role="th">DP02_0060E</th>
+<th data-quarto-table-cell-role="th">DP02_0061E</th>
+<th data-quarto-table-cell-role="th">DP02_0062E</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">721</th>
-<th data-quarto-table-cell-role="th">722</th>
-<th data-quarto-table-cell-role="th">723</th>
-<th data-quarto-table-cell-role="th">724</th>
-<th data-quarto-table-cell-role="th">725</th>
-<th data-quarto-table-cell-role="th">726</th>
-<th data-quarto-table-cell-role="th">727</th>
-<th data-quarto-table-cell-role="th">728</th>
-<th data-quarto-table-cell-role="th">729</th>
-<th data-quarto-table-cell-role="th">730</th>
+<th data-quarto-table-cell-role="th">DP04_0134E</th>
+<th data-quarto-table-cell-role="th">DP05_0001E</th>
+<th data-quarto-table-cell-role="th">DP05_0004E</th>
+<th data-quarto-table-cell-role="th">DP05_0018E</th>
+<th data-quarto-table-cell-role="th">DP05_0037E</th>
+<th data-quarto-table-cell-role="th">DP05_0038E</th>
+<th data-quarto-table-cell-role="th">DP05_0039E</th>
+<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>DP05_0001E</td>
-<td>DP05_0001EA</td>
-<td>DP05_0001M</td>
-<td>DP05_0001MA</td>
-<td>DP05_0001PE</td>
-<td>DP05_0001PEA</td>
-<td>DP05_0001PM</td>
-<td>DP05_0001PMA</td>
-<td>DP05_0002E</td>
-<td>DP05_0002EA</td>
+<td>2017</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
 <td>...</td>
-<td>DP05_0091EA</td>
-<td>DP05_0091M</td>
-<td>DP05_0091MA</td>
-<td>DP05_0091PE</td>
-<td>DP05_0091PEA</td>
-<td>DP05_0091PM</td>
-<td>DP05_0091PMA</td>
-<td>GEO_ID</td>
-<td>NAME</td>
-<td>state</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>Alabama</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>5074296</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>5074296</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2461248</td>
-<td>NaN</td>
+<td>2018</td>
+<td>0.007341</td>
+<td>0.009226</td>
+<td>-0.008186</td>
+<td>0.090413</td>
+<td>0.007228</td>
+<td>0.004783</td>
+<td>0.022710</td>
+<td>-0.002918</td>
+<td>0.018174</td>
 <td>...</td>
-<td>NaN</td>
-<td>4729</td>
-<td>NaN</td>
-<td>52.4</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US01</td>
+<td>0.050667</td>
+<td>0.002692</td>
+<td>0.003198</td>
+<td>0.010283</td>
+<td>-0.001775</td>
+<td>-0.000327</td>
+<td>-0.123824</td>
+<td>-0.027097</td>
+<td>0.217687</td>
 <td>Alabama</td>
-<td>01</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>733583</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>733583</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>385667</td>
-<td>NaN</td>
+<td>2019</td>
+<td>0.022851</td>
+<td>-0.265678</td>
+<td>-0.360479</td>
+<td>-0.317095</td>
+<td>-0.802204</td>
+<td>1.302990</td>
+<td>-0.588360</td>
+<td>-0.705200</td>
+<td>0.439418</td>
 <td>...</td>
-<td>NaN</td>
-<td>2046</td>
-<td>NaN</td>
-<td>46.8</td>
-<td>NaN</td>
-<td>0.3</td>
-<td>NaN</td>
-<td>0400000US02</td>
-<td>Alaska</td>
-<td>02</td>
+<td>0.024112</td>
+<td>0.003133</td>
+<td>-0.006376</td>
+<td>0.002545</td>
+<td>0.005908</td>
+<td>0.009572</td>
+<td>0.054480</td>
+<td>0.015884</td>
+<td>-0.178100</td>
+<td>Alabama</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>7359197</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>7359197</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3678381</td>
-<td>NaN</td>
+<td>2021</td>
+<td>0.036880</td>
+<td>0.013836</td>
+<td>0.056032</td>
+<td>-0.010988</td>
+<td>0.081890</td>
+<td>-0.050374</td>
+<td>-0.025077</td>
+<td>-0.044056</td>
+<td>0.038532</td>
 <td>...</td>
-<td>NaN</td>
-<td>8862</td>
-<td>NaN</td>
-<td>50.4</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US04</td>
-<td>Arizona</td>
-<td>04</td>
+<td>0.066914</td>
+<td>0.027878</td>
+<td>0.008556</td>
+<td>0.010152</td>
+<td>-0.013376</td>
+<td>-0.010947</td>
+<td>0.067268</td>
+<td>0.040587</td>
+<td>-0.005625</td>
+<td>Alabama</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>3045637</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>3045637</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1504488</td>
-<td>NaN</td>
+<td>2022</td>
+<td>0.024848</td>
+<td>0.041137</td>
+<td>0.053954</td>
+<td>-0.058821</td>
+<td>0.009307</td>
+<td>0.106362</td>
+<td>-0.070979</td>
+<td>-0.062720</td>
+<td>-0.020504</td>
 <td>...</td>
-<td>NaN</td>
-<td>3663</td>
-<td>NaN</td>
-<td>51.3</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US05</td>
-<td>Arkansas</td>
-<td>05</td>
+<td>0.060395</td>
+<td>0.006829</td>
+<td>-0.001060</td>
+<td>-0.005025</td>
+<td>0.006291</td>
+<td>-0.002353</td>
+<td>-0.017318</td>
+<td>0.146484</td>
+<td>10.243876</td>
+<td>Alabama</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>39029342</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>39029342</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>19536425</td>
-<td>NaN</td>
+<td data-quarto-table-cell-role="th">...</td>
 <td>...</td>
-<td>NaN</td>
-<td>28487</td>
-<td>NaN</td>
-<td>50.6</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US06</td>
-<td>California</td>
-<td>06</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>5839926</td>
+<td data-quarto-table-cell-role="th">0</td>
+<td>2017</td>
 <td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>5839926</td>
 <td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2960896</td>
 <td>NaN</td>
-<td>...</td>
 <td>NaN</td>
-<td>7496</td>
 <td>NaN</td>
-<td>49.4</td>
 <td>NaN</td>
-<td>0.1</td>
 <td>NaN</td>
-<td>0400000US08</td>
-<td>Colorado</td>
-<td>08</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>3626205</td>
 <td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>3626205</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1776689</td>
 <td>NaN</td>
 <td>...</td>
 <td>NaN</td>
-<td>6082</td>
 <td>NaN</td>
-<td>51.8</td>
 <td>NaN</td>
-<td>0.2</td>
 <td>NaN</td>
-<td>0400000US09</td>
-<td>Connecticut</td>
-<td>09</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>1018396</td>
 <td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1018396</td>
 <td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>494657</td>
 <td>NaN</td>
-<td>...</td>
 <td>NaN</td>
-<td>2391</td>
 <td>NaN</td>
-<td>52.3</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US10</td>
-<td>Delaware</td>
-<td>10</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>671803</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>671803</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>319763</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>2902</td>
-<td>NaN</td>
-<td>53.5</td>
-<td>NaN</td>
-<td>0.4</td>
-<td>NaN</td>
-<td>0400000US11</td>
 <td>District of Columbia</td>
-<td>11</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
-<td>22244823</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>22244823</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>10953468</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>17173</td>
-<td>NaN</td>
-<td>51.6</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US12</td>
-<td>Florida</td>
-<td>12</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
-<td>10912876</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>10912876</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>5323951</td>
-<td>NaN</td>
+<td data-quarto-table-cell-role="th">1</td>
+<td>2018</td>
+<td>0.021320</td>
+<td>0.018198</td>
+<td>0.049960</td>
+<td>0.151328</td>
+<td>0.030406</td>
+<td>0.112103</td>
+<td>-0.151330</td>
+<td>-0.025084</td>
+<td>-0.007725</td>
 <td>...</td>
-<td>NaN</td>
-<td>9214</td>
-<td>NaN</td>
-<td>52.2</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US13</td>
-<td>Georgia</td>
-<td>13</td>
+<td>0.011341</td>
+<td>0.012224</td>
+<td>0.006652</td>
+<td>-0.002941</td>
+<td>0.042915</td>
+<td>0.004893</td>
+<td>0.143195</td>
+<td>-0.033720</td>
+<td>0.598440</td>
+<td>District of Columbia</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
-<td>1440196</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1440196</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>725309</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>4534</td>
-<td>NaN</td>
-<td>49.3</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US15</td>
-<td>Hawaii</td>
-<td>15</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
-<td>1939033</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1939033</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>976925</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>3100</td>
-<td>NaN</td>
-<td>50.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US16</td>
-<td>Idaho</td>
-<td>16</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
-<td>12582032</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>12582032</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>6229035</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>11354</td>
-<td>NaN</td>
-<td>51.3</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US17</td>
-<td>Illinois</td>
-<td>17</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">15</td>
-<td>6833037</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>6833037</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3392667</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>6480</td>
-<td>NaN</td>
-<td>51.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US18</td>
-<td>Indiana</td>
-<td>18</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">16</td>
-<td>3200517</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>3200517</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1607659</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>3618</td>
-<td>NaN</td>
-<td>50.2</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US19</td>
-<td>Iowa</td>
-<td>19</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">17</td>
-<td>2937150</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>2937150</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1473791</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>4300</td>
-<td>NaN</td>
-<td>50.2</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US20</td>
-<td>Kansas</td>
-<td>20</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">18</td>
-<td>4512310</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>4512310</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2233158</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>3993</td>
-<td>NaN</td>
-<td>51.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US21</td>
-<td>Kentucky</td>
-<td>21</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">19</td>
-<td>4590241</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>4590241</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2248146</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>4038</td>
-<td>NaN</td>
-<td>51.9</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US22</td>
-<td>Louisiana</td>
-<td>22</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">20</td>
-<td>1385340</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1385340</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>684557</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>1854</td>
-<td>NaN</td>
-<td>51.0</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US23</td>
-<td>Maine</td>
-<td>23</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">21</td>
-<td>6164660</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>6164660</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3004117</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>8889</td>
-<td>NaN</td>
-<td>52.2</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US24</td>
-<td>Maryland</td>
-<td>24</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">22</td>
-<td>6981974</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>6981974</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3419487</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>8896</td>
-<td>NaN</td>
-<td>51.8</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US25</td>
-<td>Massachusetts</td>
-<td>25</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">23</td>
-<td>10034118</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>10034118</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>4979089</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>6935</td>
-<td>NaN</td>
-<td>50.9</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US26</td>
-<td>Michigan</td>
-<td>26</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">24</td>
-<td>5717184</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>5717184</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2869638</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>6225</td>
-<td>NaN</td>
-<td>50.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US27</td>
-<td>Minnesota</td>
-<td>27</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">25</td>
-<td>2940057</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>2940057</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1426689</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>2532</td>
-<td>NaN</td>
-<td>52.3</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US28</td>
-<td>Mississippi</td>
-<td>28</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">26</td>
-<td>6177957</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>6177957</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3046351</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>5800</td>
-<td>NaN</td>
-<td>51.2</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US29</td>
-<td>Missouri</td>
-<td>29</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">27</td>
-<td>1122867</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1122867</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>567273</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
+<td data-quarto-table-cell-role="th">2</td>
 <td>2019</td>
-<td>NaN</td>
-<td>49.5</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US30</td>
-<td>Montana</td>
-<td>30</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">28</td>
-<td>1967923</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1967923</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>988837</td>
-<td>NaN</td>
+<td>0.014241</td>
+<td>-0.355454</td>
+<td>-0.490505</td>
+<td>-0.365204</td>
+<td>-0.869834</td>
+<td>0.977101</td>
+<td>-0.287304</td>
+<td>-0.701942</td>
+<td>0.298245</td>
 <td>...</td>
-<td>NaN</td>
-<td>3288</td>
-<td>NaN</td>
-<td>50.3</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US31</td>
-<td>Nebraska</td>
-<td>31</td>
+<td>0.057388</td>
+<td>0.004689</td>
+<td>-0.008811</td>
+<td>0.011799</td>
+<td>0.011158</td>
+<td>0.002899</td>
+<td>-0.023810</td>
+<td>0.042995</td>
+<td>0.392450</td>
+<td>District of Columbia</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">29</td>
-<td>3177772</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>3177772</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1599922</td>
-<td>NaN</td>
+<td data-quarto-table-cell-role="th">3</td>
+<td>2021</td>
+<td>0.096015</td>
+<td>-0.010890</td>
+<td>0.155305</td>
+<td>-0.343210</td>
+<td>0.020759</td>
+<td>-0.059821</td>
+<td>-0.015675</td>
+<td>-0.257760</td>
+<td>-0.112117</td>
 <td>...</td>
-<td>NaN</td>
-<td>5784</td>
-<td>NaN</td>
-<td>49.9</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US32</td>
-<td>Nevada</td>
-<td>32</td>
+<td>0.040549</td>
+<td>-0.050583</td>
+<td>0.010000</td>
+<td>0.014577</td>
+<td>-0.154024</td>
+<td>-0.097916</td>
+<td>-0.320785</td>
+<td>-0.035861</td>
+<td>-0.005959</td>
+<td>District of Columbia</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">30</td>
-<td>1395231</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1395231</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>696786</td>
-<td>NaN</td>
+<td data-quarto-table-cell-role="th">4</td>
+<td>2022</td>
+<td>0.023172</td>
+<td>0.000929</td>
+<td>-0.045818</td>
+<td>-0.211063</td>
+<td>-0.092319</td>
+<td>0.055245</td>
+<td>-0.370224</td>
+<td>0.098800</td>
+<td>-0.089982</td>
 <td>...</td>
-<td>NaN</td>
-<td>2582</td>
-<td>NaN</td>
-<td>50.3</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US33</td>
-<td>New Hampshire</td>
-<td>33</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">31</td>
-<td>9261699</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>9261699</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>4564704</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>11119</td>
-<td>NaN</td>
-<td>51.6</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US34</td>
-<td>New Jersey</td>
-<td>34</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">32</td>
-<td>2113344</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>2113344</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1047785</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>5421</td>
-<td>NaN</td>
-<td>50.7</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US35</td>
-<td>New Mexico</td>
-<td>35</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">33</td>
-<td>19677151</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>19677151</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>9628899</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>17798</td>
-<td>NaN</td>
-<td>52.0</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US36</td>
-<td>New York</td>
-<td>36</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">34</td>
-<td>10698973</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>10698973</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>5229792</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>8612</td>
-<td>NaN</td>
-<td>51.9</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US37</td>
-<td>North Carolina</td>
-<td>37</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">35</td>
-<td>779261</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>779261</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>398845</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>2501</td>
-<td>NaN</td>
-<td>48.9</td>
-<td>NaN</td>
-<td>0.3</td>
-<td>NaN</td>
-<td>0400000US38</td>
-<td>North Dakota</td>
-<td>38</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">36</td>
-<td>11756058</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>11756058</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>5810211</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>7575</td>
-<td>NaN</td>
-<td>51.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US39</td>
-<td>Ohio</td>
-<td>39</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">37</td>
-<td>4019800</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>4019800</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2004195</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>3554</td>
-<td>NaN</td>
-<td>50.9</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US40</td>
-<td>Oklahoma</td>
-<td>40</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">38</td>
-<td>4240137</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>4240137</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2121651</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>5814</td>
-<td>NaN</td>
-<td>50.6</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US41</td>
-<td>Oregon</td>
-<td>41</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">39</td>
-<td>12972008</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>12972008</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>6399830</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>8869</td>
-<td>NaN</td>
-<td>51.2</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US42</td>
-<td>Pennsylvania</td>
-<td>42</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">40</td>
-<td>1093734</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1093734</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>535841</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>3513</td>
-<td>NaN</td>
-<td>51.9</td>
-<td>NaN</td>
-<td>0.3</td>
-<td>NaN</td>
-<td>0400000US44</td>
-<td>Rhode Island</td>
-<td>44</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">41</td>
-<td>5282634</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>5282634</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2569909</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>4687</td>
-<td>NaN</td>
-<td>52.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US45</td>
-<td>South Carolina</td>
-<td>45</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">42</td>
-<td>909824</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>909824</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>462457</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>2291</td>
-<td>NaN</td>
-<td>49.4</td>
-<td>NaN</td>
-<td>0.3</td>
-<td>NaN</td>
-<td>0400000US46</td>
-<td>South Dakota</td>
-<td>46</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">43</td>
-<td>7051339</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>7051339</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3462618</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>6351</td>
-<td>NaN</td>
-<td>51.7</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US47</td>
-<td>Tennessee</td>
-<td>47</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">44</td>
-<td>30029572</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>30029572</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>15021141</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>24849</td>
-<td>NaN</td>
-<td>50.6</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US48</td>
-<td>Texas</td>
-<td>48</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">45</td>
-<td>3380800</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>3380800</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1716117</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>5506</td>
-<td>NaN</td>
-<td>49.5</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US49</td>
-<td>Utah</td>
-<td>49</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">46</td>
-<td>647064</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>647064</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>320698</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>1470</td>
-<td>NaN</td>
-<td>50.8</td>
-<td>NaN</td>
-<td>0.2</td>
-<td>NaN</td>
-<td>0400000US50</td>
-<td>Vermont</td>
-<td>50</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">47</td>
-<td>8683619</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>8683619</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>4299314</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>7844</td>
-<td>NaN</td>
-<td>51.1</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US51</td>
-<td>Virginia</td>
-<td>51</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">48</td>
-<td>7785786</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>7785786</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>3930411</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>9128</td>
-<td>NaN</td>
-<td>49.8</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US53</td>
-<td>Washington</td>
-<td>53</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">49</td>
-<td>1775156</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>1775156</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>882101</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>2135</td>
-<td>NaN</td>
-<td>50.6</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US54</td>
-<td>West Virginia</td>
-<td>54</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">50</td>
-<td>5892539</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>5892539</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>2958771</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>5761</td>
-<td>NaN</td>
-<td>50.3</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US55</td>
-<td>Wisconsin</td>
-<td>55</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">51</td>
-<td>581381</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>581381</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>297855</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>1615</td>
-<td>NaN</td>
-<td>49.0</td>
-<td>NaN</td>
-<td>0.4</td>
-<td>NaN</td>
-<td>0400000US56</td>
-<td>Wyoming</td>
-<td>56</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">52</td>
-<td>3221789</td>
-<td>NaN</td>
-<td>-555555555</td>
-<td>*****</td>
-<td>3221789</td>
-<td>NaN</td>
-<td>-888888888</td>
-<td>(X)</td>
-<td>1528789</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>2767</td>
-<td>NaN</td>
-<td>53.4</td>
-<td>NaN</td>
-<td>0.1</td>
-<td>NaN</td>
-<td>0400000US72</td>
-<td>Puerto Rico</td>
-<td>72</td>
+<td>0.104916</td>
+<td>0.002616</td>
+<td>-0.001100</td>
+<td>0.002874</td>
+<td>0.016235</td>
+<td>-0.023242</td>
+<td>1.443404</td>
+<td>0.009714</td>
+<td>8.276008</td>
+<td>District of Columbia</td>
 </tr>
 </tbody>
 </table>
 
-<p>53 rows × 731 columns</p>
+<p>255 rows × 33 columns</p>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>population_2020_URL<span class="op">=</span><span class="st">'https://api.census.gov/data/2020/dec/dhc?get=group(P1)&amp;for=county</span><span class="sc">%20s</span><span class="st">ubdivision:*&amp;in=state:51&amp;in=county:*'</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pop_response <span class="op">=</span> requests.get(population_2020_URL)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pop_response <span class="op">=</span> pop_response.json()</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>pop_df<span class="op">=</span>pd.DataFrame(pop_response)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>pop_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>feature_df<span class="op">=</span>feature_df.dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>feature_df[<span class="st">'Year'</span>]<span class="op">=</span>feature_df[<span class="st">'Year'</span>].astype(<span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\npeno\AppData\Local\Temp\ipykernel_648\58169971.py:1: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  feature_df['Year']=feature_df['Year'].astype(str)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>feature_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 
 
@@ -1532,72 +646,878 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">0</th>
-<th data-quarto-table-cell-role="th">1</th>
-<th data-quarto-table-cell-role="th">2</th>
-<th data-quarto-table-cell-role="th">3</th>
-<th data-quarto-table-cell-role="th">4</th>
-<th data-quarto-table-cell-role="th">5</th>
-<th data-quarto-table-cell-role="th">6</th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">DP02_0001E</th>
+<th data-quarto-table-cell-role="th">DP02_0002E</th>
+<th data-quarto-table-cell-role="th">DP02_0003E</th>
+<th data-quarto-table-cell-role="th">DP02_0007E</th>
+<th data-quarto-table-cell-role="th">DP02_0011E</th>
+<th data-quarto-table-cell-role="th">DP02_0037E</th>
+<th data-quarto-table-cell-role="th">DP02_0060E</th>
+<th data-quarto-table-cell-role="th">DP02_0061E</th>
+<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">DP04_0134E</th>
+<th data-quarto-table-cell-role="th">DP05_0001E</th>
+<th data-quarto-table-cell-role="th">DP05_0004E</th>
+<th data-quarto-table-cell-role="th">DP05_0018E</th>
+<th data-quarto-table-cell-role="th">DP05_0037E</th>
+<th data-quarto-table-cell-role="th">DP05_0038E</th>
+<th data-quarto-table-cell-role="th">DP05_0039E</th>
+<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2018</td>
+<td>0.007341</td>
+<td>0.009226</td>
+<td>-0.008186</td>
+<td>0.090413</td>
+<td>0.007228</td>
+<td>0.004783</td>
+<td>0.022710</td>
+<td>-0.002918</td>
+<td>0.018174</td>
+<td>...</td>
+<td>0.050667</td>
+<td>0.002692</td>
+<td>0.003198</td>
+<td>0.010283</td>
+<td>-0.001775</td>
+<td>-0.000327</td>
+<td>-0.123824</td>
+<td>-0.027097</td>
+<td>0.217687</td>
+<td>Alabama</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2019</td>
+<td>0.022851</td>
+<td>-0.265678</td>
+<td>-0.360479</td>
+<td>-0.317095</td>
+<td>-0.802204</td>
+<td>1.302990</td>
+<td>-0.588360</td>
+<td>-0.705200</td>
+<td>0.439418</td>
+<td>...</td>
+<td>0.024112</td>
+<td>0.003133</td>
+<td>-0.006376</td>
+<td>0.002545</td>
+<td>0.005908</td>
+<td>0.009572</td>
+<td>0.054480</td>
+<td>0.015884</td>
+<td>-0.178100</td>
+<td>Alabama</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2021</td>
+<td>0.036880</td>
+<td>0.013836</td>
+<td>0.056032</td>
+<td>-0.010988</td>
+<td>0.081890</td>
+<td>-0.050374</td>
+<td>-0.025077</td>
+<td>-0.044056</td>
+<td>0.038532</td>
+<td>...</td>
+<td>0.066914</td>
+<td>0.027878</td>
+<td>0.008556</td>
+<td>0.010152</td>
+<td>-0.013376</td>
+<td>-0.010947</td>
+<td>0.067268</td>
+<td>0.040587</td>
+<td>-0.005625</td>
+<td>Alabama</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2022</td>
+<td>0.024848</td>
+<td>0.041137</td>
+<td>0.053954</td>
+<td>-0.058821</td>
+<td>0.009307</td>
+<td>0.106362</td>
+<td>-0.070979</td>
+<td>-0.062720</td>
+<td>-0.020504</td>
+<td>...</td>
+<td>0.060395</td>
+<td>0.006829</td>
+<td>-0.001060</td>
+<td>-0.005025</td>
+<td>0.006291</td>
+<td>-0.002353</td>
+<td>-0.017318</td>
+<td>0.146484</td>
+<td>10.243876</td>
+<td>Alabama</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2018</td>
+<td>0.015195</td>
+<td>0.000753</td>
+<td>-0.043082</td>
+<td>-0.078405</td>
+<td>0.043289</td>
+<td>0.942898</td>
+<td>-0.208181</td>
+<td>0.031255</td>
+<td>0.017837</td>
+<td>...</td>
+<td>-0.019983</td>
+<td>-0.003186</td>
+<td>-0.009174</td>
+<td>0.011594</td>
+<td>-0.000634</td>
+<td>0.139775</td>
+<td>0.012942</td>
+<td>-0.060828</td>
+<td>0.054155</td>
+<td>Alaska</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2022</td>
+<td>0.002299</td>
+<td>-0.012945</td>
+<td>-0.040358</td>
+<td>-0.228287</td>
+<td>-0.235682</td>
+<td>0.039527</td>
+<td>0.185354</td>
+<td>-0.089400</td>
+<td>0.011854</td>
+<td>...</td>
+<td>0.006749</td>
+<td>0.004454</td>
+<td>0.003820</td>
+<td>0.002564</td>
+<td>0.004535</td>
+<td>-0.387319</td>
+<td>0.073581</td>
+<td>-0.233665</td>
+<td>42.074760</td>
+<td>Wyoming</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2018</td>
+<td>0.021320</td>
+<td>0.018198</td>
+<td>0.049960</td>
+<td>0.151328</td>
+<td>0.030406</td>
+<td>0.112103</td>
+<td>-0.151330</td>
+<td>-0.025084</td>
+<td>-0.007725</td>
+<td>...</td>
+<td>0.011341</td>
+<td>0.012224</td>
+<td>0.006652</td>
+<td>-0.002941</td>
+<td>0.042915</td>
+<td>0.004893</td>
+<td>0.143195</td>
+<td>-0.033720</td>
+<td>0.598440</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2019</td>
+<td>0.014241</td>
+<td>-0.355454</td>
+<td>-0.490505</td>
+<td>-0.365204</td>
+<td>-0.869834</td>
+<td>0.977101</td>
+<td>-0.287304</td>
+<td>-0.701942</td>
+<td>0.298245</td>
+<td>...</td>
+<td>0.057388</td>
+<td>0.004689</td>
+<td>-0.008811</td>
+<td>0.011799</td>
+<td>0.011158</td>
+<td>0.002899</td>
+<td>-0.023810</td>
+<td>0.042995</td>
+<td>0.392450</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2021</td>
+<td>0.096015</td>
+<td>-0.010890</td>
+<td>0.155305</td>
+<td>-0.343210</td>
+<td>0.020759</td>
+<td>-0.059821</td>
+<td>-0.015675</td>
+<td>-0.257760</td>
+<td>-0.112117</td>
+<td>...</td>
+<td>0.040549</td>
+<td>-0.050583</td>
+<td>0.010000</td>
+<td>0.014577</td>
+<td>-0.154024</td>
+<td>-0.097916</td>
+<td>-0.320785</td>
+<td>-0.035861</td>
+<td>-0.005959</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2022</td>
+<td>0.023172</td>
+<td>0.000929</td>
+<td>-0.045818</td>
+<td>-0.211063</td>
+<td>-0.092319</td>
+<td>0.055245</td>
+<td>-0.370224</td>
+<td>0.098800</td>
+<td>-0.089982</td>
+<td>...</td>
+<td>0.104916</td>
+<td>0.002616</td>
+<td>-0.001100</td>
+<td>0.002874</td>
+<td>0.016235</td>
+<td>-0.023242</td>
+<td>1.443404</td>
+<td>0.009714</td>
+<td>8.276008</td>
+<td>District of Columbia</td>
+</tr>
+</tbody>
+</table>
+
+<p>204 rows × 33 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>zillow<span class="op">=</span>pd.read_csv(<span class="st">'data/Zillow.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>zillowlong<span class="op">=</span>zillow.melt(id_vars<span class="op">=</span>[<span class="st">'RegionName'</span>],var_name<span class="op">=</span><span class="st">'Year'</span>,value_name<span class="op">=</span><span class="st">'Typical Home Value'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>zillowlong</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">RegionName</th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>GEO_ID</td>
-<td>NAME</td>
-<td>P1_001N</td>
-<td>P1_001NA</td>
-<td>state</td>
-<td>county</td>
-<td>county subdivision</td>
+<td>California</td>
+<td>2017</td>
+<td>498316.221451</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>0600000US5100991500</td>
-<td>District 3, Amherst County, Virginia</td>
-<td>6485</td>
-<td>None</td>
-<td>51</td>
-<td>009</td>
-<td>91500</td>
+<td>Texas</td>
+<td>2017</td>
+<td>192963.504413</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0600000US5100791799</td>
-<td>District 5, Amelia County, Virginia</td>
-<td>2655</td>
-<td>None</td>
-<td>51</td>
-<td>007</td>
-<td>91799</td>
+<td>Florida</td>
+<td>2017</td>
+<td>221751.216789</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>0600000US5100991200</td>
-<td>District 1, Amherst County, Virginia</td>
-<td>6318</td>
-<td>None</td>
-<td>51</td>
-<td>009</td>
-<td>91200</td>
+<td>New York</td>
+<td>2017</td>
+<td>316846.572473</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>0600000US5100991350</td>
-<td>District 2, Amherst County, Virginia</td>
-<td>6076</td>
-<td>None</td>
-<td>51</td>
-<td>009</td>
-<td>91350</td>
+<td>Pennsylvania</td>
+<td>2017</td>
+<td>174153.095534</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">250</td>
+<td>North Dakota</td>
+<td>2022</td>
+<td>254075.792578</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">251</td>
+<td>Alaska</td>
+<td>2022</td>
+<td>350130.429150</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">252</td>
+<td>District of Columbia</td>
+<td>2022</td>
+<td>618945.155475</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">253</td>
+<td>Vermont</td>
+<td>2022</td>
+<td>368730.928380</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">254</td>
+<td>Wyoming</td>
+<td>2022</td>
+<td>331644.235988</td>
 </tr>
 </tbody>
 </table>
 
+<p>255 rows × 3 columns</p>
 </div>
 </div>
 </div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>target_df<span class="op">=</span>pd.DataFrame()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> state <span class="kw">in</span> us_states:</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    row1<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2017'</span>)]</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    row2<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2018'</span>)]</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    row3<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2019'</span>)]</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    row4<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2021'</span>)]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    row5<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2022'</span>)]</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>pd.concat([row1,row2,row3,row4,row5])</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.drop(<span class="st">'RegionName'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.set_index(<span class="st">'Year'</span>).pct_change().reset_index()</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'RegionName'</span>]<span class="op">=</span>state</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    target_df<span class="op">=</span>pd.concat([target_df,df])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>target_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2017</td>
+<td>NaN</td>
+<td>Alabama</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2018</td>
+<td>0.038688</td>
+<td>Alabama</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2019</td>
+<td>0.070360</td>
+<td>Alabama</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2021</td>
+<td>0.263465</td>
+<td>Alabama</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2022</td>
+<td>0.076587</td>
+<td>Alabama</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2017</td>
+<td>NaN</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2018</td>
+<td>0.055570</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2019</td>
+<td>0.017659</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2021</td>
+<td>0.097177</td>
+<td>District of Columbia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2022</td>
+<td>-0.009417</td>
+<td>District of Columbia</td>
+</tr>
+</tbody>
+</table>
+
+<p>255 rows × 3 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>target_df<span class="op">=</span>target_df.dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>final_data<span class="op">=</span>pd.merge(feature_df,target_df,on<span class="op">=</span>[<span class="st">'RegionName'</span>,<span class="st">'Year'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>final_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">DP02_0001E</th>
+<th data-quarto-table-cell-role="th">DP02_0002E</th>
+<th data-quarto-table-cell-role="th">DP02_0003E</th>
+<th data-quarto-table-cell-role="th">DP02_0007E</th>
+<th data-quarto-table-cell-role="th">DP02_0011E</th>
+<th data-quarto-table-cell-role="th">DP02_0037E</th>
+<th data-quarto-table-cell-role="th">DP02_0060E</th>
+<th data-quarto-table-cell-role="th">DP02_0061E</th>
+<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">DP05_0001E</th>
+<th data-quarto-table-cell-role="th">DP05_0004E</th>
+<th data-quarto-table-cell-role="th">DP05_0018E</th>
+<th data-quarto-table-cell-role="th">DP05_0037E</th>
+<th data-quarto-table-cell-role="th">DP05_0038E</th>
+<th data-quarto-table-cell-role="th">DP05_0039E</th>
+<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2018</td>
+<td>0.007341</td>
+<td>0.009226</td>
+<td>-0.008186</td>
+<td>0.090413</td>
+<td>0.007228</td>
+<td>0.004783</td>
+<td>0.022710</td>
+<td>-0.002918</td>
+<td>0.018174</td>
+<td>...</td>
+<td>0.002692</td>
+<td>0.003198</td>
+<td>0.010283</td>
+<td>-0.001775</td>
+<td>-0.000327</td>
+<td>-0.123824</td>
+<td>-0.027097</td>
+<td>0.217687</td>
+<td>Alabama</td>
+<td>0.038688</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2019</td>
+<td>0.022851</td>
+<td>-0.265678</td>
+<td>-0.360479</td>
+<td>-0.317095</td>
+<td>-0.802204</td>
+<td>1.302990</td>
+<td>-0.588360</td>
+<td>-0.705200</td>
+<td>0.439418</td>
+<td>...</td>
+<td>0.003133</td>
+<td>-0.006376</td>
+<td>0.002545</td>
+<td>0.005908</td>
+<td>0.009572</td>
+<td>0.054480</td>
+<td>0.015884</td>
+<td>-0.178100</td>
+<td>Alabama</td>
+<td>0.070360</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2021</td>
+<td>0.036880</td>
+<td>0.013836</td>
+<td>0.056032</td>
+<td>-0.010988</td>
+<td>0.081890</td>
+<td>-0.050374</td>
+<td>-0.025077</td>
+<td>-0.044056</td>
+<td>0.038532</td>
+<td>...</td>
+<td>0.027878</td>
+<td>0.008556</td>
+<td>0.010152</td>
+<td>-0.013376</td>
+<td>-0.010947</td>
+<td>0.067268</td>
+<td>0.040587</td>
+<td>-0.005625</td>
+<td>Alabama</td>
+<td>0.263465</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2022</td>
+<td>0.024848</td>
+<td>0.041137</td>
+<td>0.053954</td>
+<td>-0.058821</td>
+<td>0.009307</td>
+<td>0.106362</td>
+<td>-0.070979</td>
+<td>-0.062720</td>
+<td>-0.020504</td>
+<td>...</td>
+<td>0.006829</td>
+<td>-0.001060</td>
+<td>-0.005025</td>
+<td>0.006291</td>
+<td>-0.002353</td>
+<td>-0.017318</td>
+<td>0.146484</td>
+<td>10.243876</td>
+<td>Alabama</td>
+<td>0.076587</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2018</td>
+<td>0.015195</td>
+<td>0.000753</td>
+<td>-0.043082</td>
+<td>-0.078405</td>
+<td>0.043289</td>
+<td>0.942898</td>
+<td>-0.208181</td>
+<td>0.031255</td>
+<td>0.017837</td>
+<td>...</td>
+<td>-0.003186</td>
+<td>-0.009174</td>
+<td>0.011594</td>
+<td>-0.000634</td>
+<td>0.139775</td>
+<td>0.012942</td>
+<td>-0.060828</td>
+<td>0.054155</td>
+<td>Alaska</td>
+<td>0.005789</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">199</td>
+<td>2022</td>
+<td>0.002299</td>
+<td>-0.012945</td>
+<td>-0.040358</td>
+<td>-0.228287</td>
+<td>-0.235682</td>
+<td>0.039527</td>
+<td>0.185354</td>
+<td>-0.089400</td>
+<td>0.011854</td>
+<td>...</td>
+<td>0.004454</td>
+<td>0.003820</td>
+<td>0.002564</td>
+<td>0.004535</td>
+<td>-0.387319</td>
+<td>0.073581</td>
+<td>-0.233665</td>
+<td>42.074760</td>
+<td>Wyoming</td>
+<td>0.083624</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">200</td>
+<td>2018</td>
+<td>0.021320</td>
+<td>0.018198</td>
+<td>0.049960</td>
+<td>0.151328</td>
+<td>0.030406</td>
+<td>0.112103</td>
+<td>-0.151330</td>
+<td>-0.025084</td>
+<td>-0.007725</td>
+<td>...</td>
+<td>0.012224</td>
+<td>0.006652</td>
+<td>-0.002941</td>
+<td>0.042915</td>
+<td>0.004893</td>
+<td>0.143195</td>
+<td>-0.033720</td>
+<td>0.598440</td>
+<td>District of Columbia</td>
+<td>0.055570</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">201</td>
+<td>2019</td>
+<td>0.014241</td>
+<td>-0.355454</td>
+<td>-0.490505</td>
+<td>-0.365204</td>
+<td>-0.869834</td>
+<td>0.977101</td>
+<td>-0.287304</td>
+<td>-0.701942</td>
+<td>0.298245</td>
+<td>...</td>
+<td>0.004689</td>
+<td>-0.008811</td>
+<td>0.011799</td>
+<td>0.011158</td>
+<td>0.002899</td>
+<td>-0.023810</td>
+<td>0.042995</td>
+<td>0.392450</td>
+<td>District of Columbia</td>
+<td>0.017659</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">202</td>
+<td>2021</td>
+<td>0.096015</td>
+<td>-0.010890</td>
+<td>0.155305</td>
+<td>-0.343210</td>
+<td>0.020759</td>
+<td>-0.059821</td>
+<td>-0.015675</td>
+<td>-0.257760</td>
+<td>-0.112117</td>
+<td>...</td>
+<td>-0.050583</td>
+<td>0.010000</td>
+<td>0.014577</td>
+<td>-0.154024</td>
+<td>-0.097916</td>
+<td>-0.320785</td>
+<td>-0.035861</td>
+<td>-0.005959</td>
+<td>District of Columbia</td>
+<td>0.097177</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">203</td>
+<td>2022</td>
+<td>0.023172</td>
+<td>0.000929</td>
+<td>-0.045818</td>
+<td>-0.211063</td>
+<td>-0.092319</td>
+<td>0.055245</td>
+<td>-0.370224</td>
+<td>0.098800</td>
+<td>-0.089982</td>
+<td>...</td>
+<td>0.002616</td>
+<td>-0.001100</td>
+<td>0.002874</td>
+<td>0.016235</td>
+<td>-0.023242</td>
+<td>1.443404</td>
+<td>0.009714</td>
+<td>8.276008</td>
+<td>District of Columbia</td>
+<td>-0.009417</td>
+</tr>
+</tbody>
+</table>
+
+<p>204 rows × 34 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>final_data.to_csv(<span class="st">'./data/RecordData.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="193">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>DP02colss<span class="op">=</span>[<span class="st">'DP02_0001E'</span>,<span class="st">'DP02_0002E'</span>,<span class="st">'DP02_0003E'</span>,<span class="st">'DP02_0007E'</span>,<span class="st">'DP02_0011E'</span>,<span class="st">'DP02_0037E'</span>,<span class="st">'DP02_0060E'</span>,<span class="st">'DP02_0061E'</span>,<span class="st">'DP02_0062E'</span>,<span class="st">'DP02_0063E'</span>,<span class="st">'DP02_0064E'</span>,<span class="st">'DP02_0065E'</span>]</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>DP03colss<span class="op">=</span>[<span class="st">'DP03_0026PE'</span>,<span class="st">'DP03_0005E'</span>,<span class="st">'DP03_0062E'</span>,<span class="st">'DP03_0063E'</span>,<span class="st">'DP03_0093E'</span>,<span class="st">'DP03_0094E'</span>]</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>DP04colss<span class="op">=</span>[<span class="st">'DP04_0002E'</span>,<span class="st">'DP04_0001E'</span>,<span class="st">'DP04_0037E'</span>,<span class="st">'DP04_0047E'</span>,<span class="st">'DP04_0134E'</span>]</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>DP05colss<span class="op">=</span>[<span class="st">'DP05_0001E'</span>,<span class="st">'DP05_0004E'</span>,<span class="st">'DP05_0018E'</span>,<span class="st">'DP05_0037E'</span>,<span class="st">'DP05_0038E'</span>,<span class="st">'DP05_0039E'</span>,<span class="st">'DP05_0044E'</span>,<span class="st">'DP05_0073E'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="194">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP02colss:</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.0960146791508043
+0.08325965443347161
+0.21027912686129047
+0.5718313168095854
+0.31098100619511193
+4.71179314694135
+0.5836723372781065
+0.2331338411316648
+1.16632039564257
+3.7135790077430455
+0.20096335286522993
+1.8600379486638907</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="195">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP03colss:</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.08159905963183367
+0.9855738883335392
+0.1558987776230465
+0.13903133903133913
+0.18793842369265668
+0.19923024054982807</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="196">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP04colss:</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.0960146791508043
+0.10739311182290723
+0.03921568627450989
+0.1304236996210817
+0.17613636363636354</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="197">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP05colss:</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.06371228802533757
+0.024340770791075217
+0.026666666666666616
+0.04291548345376328
+0.9405508590128171
+1.598558282208589
+0.3942459396751741
+85.27326007326008</code></pre>
+</div>
+</div>
+<p>4.71179314694135 85.27326007326008</p>
+<p>We may need to drop some columns that are producing outliers.</p>
 
 
 
