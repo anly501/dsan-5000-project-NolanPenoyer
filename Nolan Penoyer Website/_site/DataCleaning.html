@@ -155,10 +155,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Decision Trees</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./ARM.html" rel="" target="">
- <span class="menu-text">ARM</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./Conclusions.html" rel="" target="">
  <span class="menu-text">Conclusions</span></a>
   </li>  
@@ -174,7 +170,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#record-data-cleaning-methods" id="toc-record-data-cleaning-methods" class="nav-link active" data-scroll-target="#record-data-cleaning-methods">Record Data Cleaning Methods</a></li>
+  <li><a href="#record-data-cleaning-code" id="toc-record-data-cleaning-code" class="nav-link" data-scroll-target="#record-data-cleaning-code">Record Data Cleaning Code</a></li>
+  <li><a href="#record-data-overview" id="toc-record-data-overview" class="nav-link" data-scroll-target="#record-data-overview">Record Data Overview</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -196,130 +200,155 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell" data-execution_count="1">
+<section id="record-data-cleaning-methods" class="level1">
+<h1>Record Data Cleaning Methods</h1>
+<p>In this section I will clean and merge all my record data so that I will be left with one table that I will use to build my models. I will also reconfigure my data so it will be suitable for my analysis.</p>
+<p><strong>Important: It is at this point I discovered my project was based on time series data. For the rest of the project I needed my data to follow the IID assumption (independent and identically distributed). The time series data I have is not independent, so I pivoted how I would use my data. An observational unit in my case is a specific state coupled with a specific year, like Alabama-2019. The target variable, or variable I am trying to predict, is the percent increase in home value from one year to the next. Below I will explain what a single row of my finished table means more thoroughly. Although all my data is not independent, so you will need to be wary of the validity of some of my conclusions, you can still gain useful information about real estate trends from my analysis and models I construct.</strong></p>
+<p>In the code below, you will see me read in specific columns from each table, change column names to accurately represent what is in the column, merge and concatenate all the tables together as one, drop NA values that result from the merges, convert each cell to percent change from the previous year, and check for potential problems with the data, specifically outliers.</p>
+</section>
+<section id="record-data-cleaning-code" class="level1">
+<h1>Record Data Cleaning Code</h1>
+<div class="cell" data-execution_count="70">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>DP02cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP02_0001E'</span>,<span class="st">'DP02_0002E'</span>,<span class="st">'DP02_0003E'</span>,<span class="st">'DP02_0007E'</span>,<span class="st">'DP02_0011E'</span>,<span class="st">'DP02_0037E'</span>,<span class="st">'DP02_0060E'</span>,<span class="st">'DP02_0061E'</span>,<span class="st">'DP02_0062E'</span>,<span class="st">'DP02_0063E'</span>,<span class="st">'DP02_0064E'</span>,<span class="st">'DP02_0065E'</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>DP03cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP03_0026PE'</span>,<span class="st">'DP03_0005E'</span>,<span class="st">'DP03_0062E'</span>,<span class="st">'DP03_0063E'</span>,<span class="st">'DP03_0093E'</span>,<span class="st">'DP03_0094E'</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>DP04cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP04_0002E'</span>,<span class="st">'DP04_0001E'</span>,<span class="st">'DP04_0037E'</span>,<span class="st">'DP04_0047E'</span>,<span class="st">'DP04_0134E'</span>]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>DP05cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP05_0001E'</span>,<span class="st">'DP05_0004E'</span>,<span class="st">'DP05_0018E'</span>,<span class="st">'DP05_0037E'</span>,<span class="st">'DP05_0038E'</span>,<span class="st">'DP05_0039E'</span>,<span class="st">'DP05_0044E'</span>,<span class="st">'DP05_0071E'</span>]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>DP0217<span class="op">=</span>pd.read_csv(<span class="st">'data/2017DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>DP0218<span class="op">=</span>pd.read_csv(<span class="st">'data/2018DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>DP0219<span class="op">=</span>pd.read_csv(<span class="st">'data/2019DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>DP0221<span class="op">=</span>pd.read_csv(<span class="st">'data/2021DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>DP0222<span class="op">=</span>pd.read_csv(<span class="st">'data/2022DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>DP0317 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>DP0318 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>DP0319 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>DP0321 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>DP0322 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>DP0417 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>DP0418 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>DP0419 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>DP0421 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>DP0422 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>DP0517 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>DP0518 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>DP0519 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>DP0521 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>DP0522 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>DP0217<span class="op">=</span>DP0217[DP02cols]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>DP0217[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2017</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>DP0218<span class="op">=</span>DP0218[DP02cols]</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>DP0218[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2018</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>DP0219<span class="op">=</span>DP0219[DP02cols]</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>DP0219[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2019</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>DP0221<span class="op">=</span>DP0221[DP02cols]</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>DP0221[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2021</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>DP0222<span class="op">=</span>DP0222[DP02cols]</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>DP0222[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2022</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>DP0317 <span class="op">=</span> DP0317[DP03cols]</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>DP0318 <span class="op">=</span> DP0318[DP03cols]</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>DP0319 <span class="op">=</span> DP0319[DP03cols]</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>DP0321 <span class="op">=</span> DP0321[DP03cols]</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>DP0322 <span class="op">=</span> DP0322[DP03cols]</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>DP0417 <span class="op">=</span> DP0417[DP04cols]</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>DP0418 <span class="op">=</span> DP0418[DP04cols]</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>DP0419 <span class="op">=</span> DP0419[DP04cols]</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>DP0421 <span class="op">=</span> DP0421[DP04cols]</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>DP0422 <span class="op">=</span> DP0422[DP04cols]</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>DP0517 <span class="op">=</span> DP0517[DP05cols]</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>DP0518 <span class="op">=</span> DP0518[DP05cols]</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>DP0519 <span class="op">=</span> DP0519[DP05cols]</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>DP0521 <span class="op">=</span> DP0521[DP05cols]</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>DP0522 <span class="op">=</span> DP0522[DP05cols]</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(DP0217,DP0317,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(df2017,DP0417,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(df2017,DP0517,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(DP0218,DP0318,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(df2018,DP0418,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(df2018,DP0518,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(DP0219,DP0319,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(df2019,DP0419,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(df2019,DP0519,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(DP0221,DP0321,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(df2021,DP0421,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(df2021,DP0521,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(DP0222,DP0322,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(df2022,DP0422,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(df2022,DP0522,on<span class="op">=</span><span class="st">'NAME'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<p>I clean all the data here so I can begin to do analysis and try to build some useful models. I’ll start by reading in a csv, selecting some columns, and changing the column names.</p>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>DP02cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP02_0001E'</span>,<span class="st">'DP02_0002E'</span>,<span class="st">'DP02_0003E'</span>,<span class="st">'DP02_0007E'</span>,<span class="st">'DP02_0011E'</span>,<span class="st">'DP02_0037E'</span>,<span class="st">'DP02_0060E'</span>,<span class="st">'DP02_0061E'</span>,<span class="st">'DP02_0062E'</span>,<span class="st">'DP02_0063E'</span>,<span class="st">'DP02_0064E'</span>,<span class="st">'DP02_0065E'</span>]</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>DP03cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP03_0026PE'</span>,<span class="st">'DP03_0005E'</span>,<span class="st">'DP03_0062E'</span>,<span class="st">'DP03_0063E'</span>,<span class="st">'DP03_0093E'</span>,<span class="st">'DP03_0094E'</span>]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>DP04cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP04_0002E'</span>,<span class="st">'DP04_0001E'</span>,<span class="st">'DP04_0037E'</span>,<span class="st">'DP04_0047E'</span>,<span class="st">'DP04_0134E'</span>]</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>DP05cols<span class="op">=</span>[<span class="st">'NAME'</span>,<span class="st">'DP05_0001E'</span>,<span class="st">'DP05_0004E'</span>,<span class="st">'DP05_0018E'</span>,<span class="st">'DP05_0037E'</span>,<span class="st">'DP05_0038E'</span>,<span class="st">'DP05_0039E'</span>,<span class="st">'DP05_0044E'</span>,<span class="st">'DP05_0073E'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="71">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df2017.columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="71">
+<pre><code>Index(['NAME', 'DP02_0001E', 'DP02_0002E', 'DP02_0003E', 'DP02_0007E',
+       'DP02_0011E', 'DP02_0037E', 'DP02_0060E', 'DP02_0061E', 'DP02_0062E',
+       'DP02_0063E', 'DP02_0064E', 'DP02_0065E', 'Year', 'DP03_0026PE',
+       'DP03_0005E', 'DP03_0062E', 'DP03_0063E', 'DP03_0093E', 'DP03_0094E',
+       'DP04_0002E', 'DP04_0001E', 'DP04_0037E', 'DP04_0047E', 'DP04_0134E',
+       'DP05_0001E', 'DP05_0004E', 'DP05_0018E', 'DP05_0037E', 'DP05_0038E',
+       'DP05_0039E', 'DP05_0044E', 'DP05_0071E'],
+      dtype='object')</code></pre>
 </div>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>DP0217<span class="op">=</span>pd.read_csv(<span class="st">'data/2017DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>DP0218<span class="op">=</span>pd.read_csv(<span class="st">'data/2018DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>DP0219<span class="op">=</span>pd.read_csv(<span class="st">'data/2019DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>DP0221<span class="op">=</span>pd.read_csv(<span class="st">'data/2021DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>DP0222<span class="op">=</span>pd.read_csv(<span class="st">'data/2022DP02.csv'</span>,skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>DP0317 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>DP0318 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>DP0319 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>DP0321 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>DP0322 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP03.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>DP0417 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>DP0418 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>DP0419 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>DP0421 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>DP0422 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP04.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>DP0517 <span class="op">=</span> pd.read_csv(<span class="st">'data/2017DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>DP0518 <span class="op">=</span> pd.read_csv(<span class="st">'data/2018DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>DP0519 <span class="op">=</span> pd.read_csv(<span class="st">'data/2019DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>DP0521 <span class="op">=</span> pd.read_csv(<span class="st">'data/2021DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>DP0522 <span class="op">=</span> pd.read_csv(<span class="st">'data/2022DP05.csv'</span>, skiprows<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DP0217<span class="op">=</span>DP0217[DP02cols]</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>DP0217[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2017</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>DP0218<span class="op">=</span>DP0218[DP02cols]</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>DP0218[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2018</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>DP0219<span class="op">=</span>DP0219[DP02cols]</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>DP0219[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2019</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>DP0221<span class="op">=</span>DP0221[DP02cols]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>DP0221[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2021</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>DP0222<span class="op">=</span>DP0222[DP02cols]</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>DP0222[<span class="st">'Year'</span>]<span class="op">=</span><span class="dv">2022</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="72">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>us_states <span class="op">=</span> [</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Alabama"</span>, <span class="st">"Alaska"</span>, <span class="st">"Arizona"</span>, <span class="st">"Arkansas"</span>, <span class="st">"California"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Colorado"</span>, <span class="st">"Connecticut"</span>, <span class="st">"Delaware"</span>, <span class="st">"Florida"</span>, <span class="st">"Georgia"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hawaii"</span>, <span class="st">"Idaho"</span>, <span class="st">"Illinois"</span>, <span class="st">"Indiana"</span>, <span class="st">"Iowa"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Kansas"</span>, <span class="st">"Kentucky"</span>, <span class="st">"Louisiana"</span>, <span class="st">"Maine"</span>, <span class="st">"Maryland"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Massachusetts"</span>, <span class="st">"Michigan"</span>, <span class="st">"Minnesota"</span>, <span class="st">"Mississippi"</span>, <span class="st">"Missouri"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Montana"</span>, <span class="st">"Nebraska"</span>, <span class="st">"Nevada"</span>, <span class="st">"New Hampshire"</span>, <span class="st">"New Jersey"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"New Mexico"</span>, <span class="st">"New York"</span>, <span class="st">"North Carolina"</span>, <span class="st">"North Dakota"</span>, <span class="st">"Ohio"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Oklahoma"</span>, <span class="st">"Oregon"</span>, <span class="st">"Pennsylvania"</span>, <span class="st">"Rhode Island"</span>, <span class="st">"South Carolina"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"South Dakota"</span>, <span class="st">"Tennessee"</span>, <span class="st">"Texas"</span>, <span class="st">"Utah"</span>, <span class="st">"Vermont"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Virginia"</span>, <span class="st">"Washington"</span>, <span class="st">"West Virginia"</span>, <span class="st">"Wisconsin"</span>, <span class="st">"Wyoming"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"District of Columbia"</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>feature_df<span class="op">=</span>pd.DataFrame()</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> state <span class="kw">in</span> us_states:</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    row1<span class="op">=</span>df2017[df2017[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    row2<span class="op">=</span>df2018[df2018[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    row3<span class="op">=</span>df2019[df2019[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    row4<span class="op">=</span>df2021[df2021[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    row5<span class="op">=</span>df2022[df2022[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>pd.concat([row1,row2,row3,row4,row5])</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.drop(<span class="st">'NAME'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.set_index(<span class="st">'Year'</span>).pct_change().reset_index()</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'RegionName'</span>]<span class="op">=</span>state</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    feature_df<span class="op">=</span>pd.concat([feature_df,df])</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>feature_df<span class="op">=</span>feature_df.dropna()</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>feature_df[<span class="st">'Year'</span>]<span class="op">=</span>feature_df[<span class="st">'Year'</span>].astype(<span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>DP0317 <span class="op">=</span> DP0317[DP03cols]</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>DP0318 <span class="op">=</span> DP0318[DP03cols]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>DP0319 <span class="op">=</span> DP0319[DP03cols]</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>DP0321 <span class="op">=</span> DP0321[DP03cols]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>DP0322 <span class="op">=</span> DP0322[DP03cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>DP0417 <span class="op">=</span> DP0417[DP04cols]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>DP0418 <span class="op">=</span> DP0418[DP04cols]</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>DP0419 <span class="op">=</span> DP0419[DP04cols]</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>DP0421 <span class="op">=</span> DP0421[DP04cols]</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>DP0422 <span class="op">=</span> DP0422[DP04cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>DP0517 <span class="op">=</span> DP0517[DP05cols]</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>DP0518 <span class="op">=</span> DP0518[DP05cols]</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>DP0519 <span class="op">=</span> DP0519[DP05cols]</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>DP0521 <span class="op">=</span> DP0521[DP05cols]</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>DP0522 <span class="op">=</span> DP0522[DP05cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(DP0217,DP0317,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(df2017,DP0417,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df2017<span class="op">=</span>pd.merge(df2017,DP0517,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(DP0218,DP0318,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(df2018,DP0418,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>df2018<span class="op">=</span>pd.merge(df2018,DP0518,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(DP0219,DP0319,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(df2019,DP0419,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>df2019<span class="op">=</span>pd.merge(df2019,DP0519,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(DP0221,DP0321,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(df2021,DP0421,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>df2021<span class="op">=</span>pd.merge(df2021,DP0521,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(DP0222,DP0322,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(df2022,DP0422,on<span class="op">=</span><span class="st">'NAME'</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>df2022<span class="op">=</span>pd.merge(df2022,DP0522,on<span class="op">=</span><span class="st">'NAME'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>us_states <span class="op">=</span> [</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Alabama"</span>, <span class="st">"Alaska"</span>, <span class="st">"Arizona"</span>, <span class="st">"Arkansas"</span>, <span class="st">"California"</span>,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Colorado"</span>, <span class="st">"Connecticut"</span>, <span class="st">"Delaware"</span>, <span class="st">"Florida"</span>, <span class="st">"Georgia"</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Hawaii"</span>, <span class="st">"Idaho"</span>, <span class="st">"Illinois"</span>, <span class="st">"Indiana"</span>, <span class="st">"Iowa"</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Kansas"</span>, <span class="st">"Kentucky"</span>, <span class="st">"Louisiana"</span>, <span class="st">"Maine"</span>, <span class="st">"Maryland"</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Massachusetts"</span>, <span class="st">"Michigan"</span>, <span class="st">"Minnesota"</span>, <span class="st">"Mississippi"</span>, <span class="st">"Missouri"</span>,</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Montana"</span>, <span class="st">"Nebraska"</span>, <span class="st">"Nevada"</span>, <span class="st">"New Hampshire"</span>, <span class="st">"New Jersey"</span>,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"New Mexico"</span>, <span class="st">"New York"</span>, <span class="st">"North Carolina"</span>, <span class="st">"North Dakota"</span>, <span class="st">"Ohio"</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Oklahoma"</span>, <span class="st">"Oregon"</span>, <span class="st">"Pennsylvania"</span>, <span class="st">"Rhode Island"</span>, <span class="st">"South Carolina"</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"South Dakota"</span>, <span class="st">"Tennessee"</span>, <span class="st">"Texas"</span>, <span class="st">"Utah"</span>, <span class="st">"Vermont"</span>,</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Virginia"</span>, <span class="st">"Washington"</span>, <span class="st">"West Virginia"</span>, <span class="st">"Wisconsin"</span>, <span class="st">"Wyoming"</span>,</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"District of Columbia"</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>feature_df<span class="op">=</span>pd.DataFrame()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> state <span class="kw">in</span> us_states:</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    row1<span class="op">=</span>df2017[df2017[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    row2<span class="op">=</span>df2018[df2018[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    row3<span class="op">=</span>df2019[df2019[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    row4<span class="op">=</span>df2021[df2021[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    row5<span class="op">=</span>df2022[df2022[<span class="st">'NAME'</span>]<span class="op">==</span>state]</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>pd.concat([row1,row2,row3,row4,row5])</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.drop(<span class="st">'NAME'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.set_index(<span class="st">'Year'</span>).pct_change().reset_index()</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'RegionName'</span>]<span class="op">=</span>state</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    feature_df<span class="op">=</span>pd.concat([feature_df,df])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>feature_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell" data-execution_count="73">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>feature_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="73">
 <div>
 
 
@@ -346,326 +375,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <th data-quarto-table-cell-role="th">DP05_0038E</th>
 <th data-quarto-table-cell-role="th">DP05_0039E</th>
 <th data-quarto-table-cell-role="th">DP05_0044E</th>
-<th data-quarto-table-cell-role="th">DP05_0073E</th>
-<th data-quarto-table-cell-role="th">RegionName</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2017</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>Alabama</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2018</td>
-<td>0.007341</td>
-<td>0.009226</td>
-<td>-0.008186</td>
-<td>0.090413</td>
-<td>0.007228</td>
-<td>0.004783</td>
-<td>0.022710</td>
-<td>-0.002918</td>
-<td>0.018174</td>
-<td>...</td>
-<td>0.050667</td>
-<td>0.002692</td>
-<td>0.003198</td>
-<td>0.010283</td>
-<td>-0.001775</td>
-<td>-0.000327</td>
-<td>-0.123824</td>
-<td>-0.027097</td>
-<td>0.217687</td>
-<td>Alabama</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2019</td>
-<td>0.022851</td>
-<td>-0.265678</td>
-<td>-0.360479</td>
-<td>-0.317095</td>
-<td>-0.802204</td>
-<td>1.302990</td>
-<td>-0.588360</td>
-<td>-0.705200</td>
-<td>0.439418</td>
-<td>...</td>
-<td>0.024112</td>
-<td>0.003133</td>
-<td>-0.006376</td>
-<td>0.002545</td>
-<td>0.005908</td>
-<td>0.009572</td>
-<td>0.054480</td>
-<td>0.015884</td>
-<td>-0.178100</td>
-<td>Alabama</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2021</td>
-<td>0.036880</td>
-<td>0.013836</td>
-<td>0.056032</td>
-<td>-0.010988</td>
-<td>0.081890</td>
-<td>-0.050374</td>
-<td>-0.025077</td>
-<td>-0.044056</td>
-<td>0.038532</td>
-<td>...</td>
-<td>0.066914</td>
-<td>0.027878</td>
-<td>0.008556</td>
-<td>0.010152</td>
-<td>-0.013376</td>
-<td>-0.010947</td>
-<td>0.067268</td>
-<td>0.040587</td>
-<td>-0.005625</td>
-<td>Alabama</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2022</td>
-<td>0.024848</td>
-<td>0.041137</td>
-<td>0.053954</td>
-<td>-0.058821</td>
-<td>0.009307</td>
-<td>0.106362</td>
-<td>-0.070979</td>
-<td>-0.062720</td>
-<td>-0.020504</td>
-<td>...</td>
-<td>0.060395</td>
-<td>0.006829</td>
-<td>-0.001060</td>
-<td>-0.005025</td>
-<td>0.006291</td>
-<td>-0.002353</td>
-<td>-0.017318</td>
-<td>0.146484</td>
-<td>10.243876</td>
-<td>Alabama</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2017</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>...</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2018</td>
-<td>0.021320</td>
-<td>0.018198</td>
-<td>0.049960</td>
-<td>0.151328</td>
-<td>0.030406</td>
-<td>0.112103</td>
-<td>-0.151330</td>
-<td>-0.025084</td>
-<td>-0.007725</td>
-<td>...</td>
-<td>0.011341</td>
-<td>0.012224</td>
-<td>0.006652</td>
-<td>-0.002941</td>
-<td>0.042915</td>
-<td>0.004893</td>
-<td>0.143195</td>
-<td>-0.033720</td>
-<td>0.598440</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2019</td>
-<td>0.014241</td>
-<td>-0.355454</td>
-<td>-0.490505</td>
-<td>-0.365204</td>
-<td>-0.869834</td>
-<td>0.977101</td>
-<td>-0.287304</td>
-<td>-0.701942</td>
-<td>0.298245</td>
-<td>...</td>
-<td>0.057388</td>
-<td>0.004689</td>
-<td>-0.008811</td>
-<td>0.011799</td>
-<td>0.011158</td>
-<td>0.002899</td>
-<td>-0.023810</td>
-<td>0.042995</td>
-<td>0.392450</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2021</td>
-<td>0.096015</td>
-<td>-0.010890</td>
-<td>0.155305</td>
-<td>-0.343210</td>
-<td>0.020759</td>
-<td>-0.059821</td>
-<td>-0.015675</td>
-<td>-0.257760</td>
-<td>-0.112117</td>
-<td>...</td>
-<td>0.040549</td>
-<td>-0.050583</td>
-<td>0.010000</td>
-<td>0.014577</td>
-<td>-0.154024</td>
-<td>-0.097916</td>
-<td>-0.320785</td>
-<td>-0.035861</td>
-<td>-0.005959</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2022</td>
-<td>0.023172</td>
-<td>0.000929</td>
-<td>-0.045818</td>
-<td>-0.211063</td>
-<td>-0.092319</td>
-<td>0.055245</td>
-<td>-0.370224</td>
-<td>0.098800</td>
-<td>-0.089982</td>
-<td>...</td>
-<td>0.104916</td>
-<td>0.002616</td>
-<td>-0.001100</td>
-<td>0.002874</td>
-<td>0.016235</td>
-<td>-0.023242</td>
-<td>1.443404</td>
-<td>0.009714</td>
-<td>8.276008</td>
-<td>District of Columbia</td>
-</tr>
-</tbody>
-</table>
-
-<p>255 rows × 33 columns</p>
-</div>
-</div>
-</div>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>feature_df<span class="op">=</span>feature_df.dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>feature_df[<span class="st">'Year'</span>]<span class="op">=</span>feature_df[<span class="st">'Year'</span>].astype(<span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>C:\Users\npeno\AppData\Local\Temp\ipykernel_648\58169971.py:1: SettingWithCopyWarning: 
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  feature_df['Year']=feature_df['Year'].astype(str)</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>feature_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">DP02_0001E</th>
-<th data-quarto-table-cell-role="th">DP02_0002E</th>
-<th data-quarto-table-cell-role="th">DP02_0003E</th>
-<th data-quarto-table-cell-role="th">DP02_0007E</th>
-<th data-quarto-table-cell-role="th">DP02_0011E</th>
-<th data-quarto-table-cell-role="th">DP02_0037E</th>
-<th data-quarto-table-cell-role="th">DP02_0060E</th>
-<th data-quarto-table-cell-role="th">DP02_0061E</th>
-<th data-quarto-table-cell-role="th">DP02_0062E</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">DP04_0134E</th>
-<th data-quarto-table-cell-role="th">DP05_0001E</th>
-<th data-quarto-table-cell-role="th">DP05_0004E</th>
-<th data-quarto-table-cell-role="th">DP05_0018E</th>
-<th data-quarto-table-cell-role="th">DP05_0037E</th>
-<th data-quarto-table-cell-role="th">DP05_0038E</th>
-<th data-quarto-table-cell-role="th">DP05_0039E</th>
-<th data-quarto-table-cell-role="th">DP05_0044E</th>
-<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">DP05_0071E</th>
 <th data-quarto-table-cell-role="th">RegionName</th>
 </tr>
 </thead>
@@ -691,7 +401,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>-0.000327</td>
 <td>-0.123824</td>
 <td>-0.027097</td>
-<td>0.217687</td>
+<td>0.047111</td>
 <td>Alabama</td>
 </tr>
 <tr class="even">
@@ -715,7 +425,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>0.009572</td>
 <td>0.054480</td>
 <td>0.015884</td>
-<td>-0.178100</td>
+<td>0.036934</td>
 <td>Alabama</td>
 </tr>
 <tr class="odd">
@@ -739,7 +449,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>-0.010947</td>
 <td>0.067268</td>
 <td>0.040587</td>
-<td>-0.005625</td>
+<td>0.082710</td>
 <td>Alabama</td>
 </tr>
 <tr class="even">
@@ -763,7 +473,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>-0.002353</td>
 <td>-0.017318</td>
 <td>0.146484</td>
-<td>10.243876</td>
+<td>-0.125037</td>
 <td>Alabama</td>
 </tr>
 <tr class="odd">
@@ -787,169 +497,29 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>0.139775</td>
 <td>0.012942</td>
 <td>-0.060828</td>
-<td>0.054155</td>
+<td>0.026241</td>
 <td>Alaska</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2022</td>
-<td>0.002299</td>
-<td>-0.012945</td>
-<td>-0.040358</td>
-<td>-0.228287</td>
-<td>-0.235682</td>
-<td>0.039527</td>
-<td>0.185354</td>
-<td>-0.089400</td>
-<td>0.011854</td>
-<td>...</td>
-<td>0.006749</td>
-<td>0.004454</td>
-<td>0.003820</td>
-<td>0.002564</td>
-<td>0.004535</td>
-<td>-0.387319</td>
-<td>0.073581</td>
-<td>-0.233665</td>
-<td>42.074760</td>
-<td>Wyoming</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2018</td>
-<td>0.021320</td>
-<td>0.018198</td>
-<td>0.049960</td>
-<td>0.151328</td>
-<td>0.030406</td>
-<td>0.112103</td>
-<td>-0.151330</td>
-<td>-0.025084</td>
-<td>-0.007725</td>
-<td>...</td>
-<td>0.011341</td>
-<td>0.012224</td>
-<td>0.006652</td>
-<td>-0.002941</td>
-<td>0.042915</td>
-<td>0.004893</td>
-<td>0.143195</td>
-<td>-0.033720</td>
-<td>0.598440</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2019</td>
-<td>0.014241</td>
-<td>-0.355454</td>
-<td>-0.490505</td>
-<td>-0.365204</td>
-<td>-0.869834</td>
-<td>0.977101</td>
-<td>-0.287304</td>
-<td>-0.701942</td>
-<td>0.298245</td>
-<td>...</td>
-<td>0.057388</td>
-<td>0.004689</td>
-<td>-0.008811</td>
-<td>0.011799</td>
-<td>0.011158</td>
-<td>0.002899</td>
-<td>-0.023810</td>
-<td>0.042995</td>
-<td>0.392450</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2021</td>
-<td>0.096015</td>
-<td>-0.010890</td>
-<td>0.155305</td>
-<td>-0.343210</td>
-<td>0.020759</td>
-<td>-0.059821</td>
-<td>-0.015675</td>
-<td>-0.257760</td>
-<td>-0.112117</td>
-<td>...</td>
-<td>0.040549</td>
-<td>-0.050583</td>
-<td>0.010000</td>
-<td>0.014577</td>
-<td>-0.154024</td>
-<td>-0.097916</td>
-<td>-0.320785</td>
-<td>-0.035861</td>
-<td>-0.005959</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2022</td>
-<td>0.023172</td>
-<td>0.000929</td>
-<td>-0.045818</td>
-<td>-0.211063</td>
-<td>-0.092319</td>
-<td>0.055245</td>
-<td>-0.370224</td>
-<td>0.098800</td>
-<td>-0.089982</td>
-<td>...</td>
-<td>0.104916</td>
-<td>0.002616</td>
-<td>-0.001100</td>
-<td>0.002874</td>
-<td>0.016235</td>
-<td>-0.023242</td>
-<td>1.443404</td>
-<td>0.009714</td>
-<td>8.276008</td>
-<td>District of Columbia</td>
 </tr>
 </tbody>
 </table>
 
-<p>204 rows × 33 columns</p>
+<p>5 rows × 33 columns</p>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>zillow<span class="op">=</span>pd.read_csv(<span class="st">'data/Zillow.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="74">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>zillow<span class="op">=</span>pd.read_csv(<span class="st">'data/Zillow.csv'</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>zillowlong<span class="op">=</span>zillow.melt(id_vars<span class="op">=</span>[<span class="st">'RegionName'</span>],var_name<span class="op">=</span><span class="st">'Year'</span>,value_name<span class="op">=</span><span class="st">'Typical Home Value'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>zillowlong<span class="op">=</span>zillow.melt(id_vars<span class="op">=</span>[<span class="st">'RegionName'</span>],var_name<span class="op">=</span><span class="st">'Year'</span>,value_name<span class="op">=</span><span class="st">'Typical Home Value'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>zillowlong</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div class="cell" data-execution_count="75">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>zillowlong.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="75">
 <div>
 
 
@@ -993,68 +563,45 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>2017</td>
 <td>174153.095534</td>
 </tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">250</td>
-<td>North Dakota</td>
-<td>2022</td>
-<td>254075.792578</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">251</td>
-<td>Alaska</td>
-<td>2022</td>
-<td>350130.429150</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">252</td>
-<td>District of Columbia</td>
-<td>2022</td>
-<td>618945.155475</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">253</td>
-<td>Vermont</td>
-<td>2022</td>
-<td>368730.928380</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">254</td>
-<td>Wyoming</td>
-<td>2022</td>
-<td>331644.235988</td>
-</tr>
 </tbody>
 </table>
 
-<p>255 rows × 3 columns</p>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>target_df<span class="op">=</span>pd.DataFrame()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="76">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>target_df<span class="op">=</span>pd.DataFrame()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> state <span class="kw">in</span> us_states:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    row1<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2017'</span>)]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    row2<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2018'</span>)]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    row3<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2019'</span>)]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    row4<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2021'</span>)]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    row5<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2022'</span>)]</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>pd.concat([row1,row2,row3,row4,row5])</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.drop(<span class="st">'RegionName'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.set_index(<span class="st">'Year'</span>).pct_change().reset_index()</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'RegionName'</span>]<span class="op">=</span>state</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    target_df<span class="op">=</span>pd.concat([target_df,df])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> state <span class="kw">in</span> us_states:</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    row1<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2017'</span>)]</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    row2<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2018'</span>)]</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    row3<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2019'</span>)]</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    row4<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2021'</span>)]</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    row5<span class="op">=</span>zillowlong[(zillowlong[<span class="st">'RegionName'</span>]<span class="op">==</span>state)<span class="op">&amp;</span>(zillowlong[<span class="st">'Year'</span>]<span class="op">==</span><span class="st">'2022'</span>)]</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>pd.concat([row1,row2,row3,row4,row5])</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.drop(<span class="st">'RegionName'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    df<span class="op">=</span>df.set_index(<span class="st">'Year'</span>).pct_change().reset_index()</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'RegionName'</span>]<span class="op">=</span>state</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    target_df<span class="op">=</span>pd.concat([target_df,df])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="77">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>target_df<span class="op">=</span>target_df.dropna()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>final_data<span class="op">=</span>pd.merge(feature_df,target_df,on<span class="op">=</span>[<span class="st">'RegionName'</span>,<span class="st">'Year'</span>])</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>new_column_names<span class="op">=</span>[<span class="st">'Year'</span>,<span class="st">'Total households'</span>,<span class="st">'Married couple households'</span>,<span class="st">'Married couple with children of the householder under 18 years'</span>,<span class="st">'Male householder,no spouse/partner present with children of the householder under 18 years'</span>,<span class="st">'Female householder, no spouse/partner present with children of the householder under 18 years'</span>,<span class="st">'Number of women 15 to 50 years old who had a birth in the past 12 months'</span>,<span class="st">'Less than 9th grade'</span>,<span class="st">'9th to 12th grade,no diploma'</span>,<span class="st">'High school graduate (includes equivalency)'</span>,<span class="st">'Some college, no degree'</span>,<span class="st">'Associates degree'</span>,<span class="st">'Bachelors degree'</span>,<span class="st">'Number of people employed'</span>,<span class="st">'Number of people unemployed'</span>,<span class="st">'Median Household Income'</span>,<span class="st">'Mean Household Income'</span>,<span class="st">'Median earnings for male full-time, year-round workers'</span>,<span class="st">'Median earnings for female full-time, year-round workers'</span>,<span class="st">'Occupied Housing Units'</span>,<span class="st">'Total Housing Units'</span>,<span class="st">'Median Rooms'</span>,<span class="st">'Renter Occupied Housing Units'</span>,<span class="st">'Mean Rent Paid'</span>,<span class="st">'Total population'</span>,<span class="st">'Sex ratio (males per 100 females)'</span>,<span class="st">'Median Age'</span>,<span class="st">'Race-White'</span>,<span class="st">'Race-Black'</span>,<span class="st">'Race-American Indian and Alaska Native'</span>,<span class="st">'Race-Asian'</span>,<span class="st">'Hispanic or Latino'</span>,<span class="st">'RegionName'</span>,<span class="st">'Typical Home Value'</span>]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>final_data.columns<span class="op">=</span>new_column_names</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>final_data.to_csv(<span class="st">'./data/RecordData.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>target_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="cell" data-execution_count="78">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>final_data.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="78">
 <div>
 
 
@@ -1063,119 +610,24 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">Typical Home Value</th>
-<th data-quarto-table-cell-role="th">RegionName</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2017</td>
-<td>NaN</td>
-<td>Alabama</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2018</td>
-<td>0.038688</td>
-<td>Alabama</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2019</td>
-<td>0.070360</td>
-<td>Alabama</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2021</td>
-<td>0.263465</td>
-<td>Alabama</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2022</td>
-<td>0.076587</td>
-<td>Alabama</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>2017</td>
-<td>NaN</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2018</td>
-<td>0.055570</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2019</td>
-<td>0.017659</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>2021</td>
-<td>0.097177</td>
-<td>District of Columbia</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>2022</td>
-<td>-0.009417</td>
-<td>District of Columbia</td>
-</tr>
-</tbody>
-</table>
-
-<p>255 rows × 3 columns</p>
-</div>
-</div>
-</div>
-<div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>target_df<span class="op">=</span>target_df.dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>final_data<span class="op">=</span>pd.merge(feature_df,target_df,on<span class="op">=</span>[<span class="st">'RegionName'</span>,<span class="st">'Year'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>final_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">DP02_0001E</th>
-<th data-quarto-table-cell-role="th">DP02_0002E</th>
-<th data-quarto-table-cell-role="th">DP02_0003E</th>
-<th data-quarto-table-cell-role="th">DP02_0007E</th>
-<th data-quarto-table-cell-role="th">DP02_0011E</th>
-<th data-quarto-table-cell-role="th">DP02_0037E</th>
-<th data-quarto-table-cell-role="th">DP02_0060E</th>
-<th data-quarto-table-cell-role="th">DP02_0061E</th>
-<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">Total households</th>
+<th data-quarto-table-cell-role="th">Married couple households</th>
+<th data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</th>
+<th data-quarto-table-cell-role="th">Less than 9th grade</th>
+<th data-quarto-table-cell-role="th">9th to 12th grade,no diploma</th>
+<th data-quarto-table-cell-role="th">High school graduate (includes equivalency)</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">DP05_0001E</th>
-<th data-quarto-table-cell-role="th">DP05_0004E</th>
-<th data-quarto-table-cell-role="th">DP05_0018E</th>
-<th data-quarto-table-cell-role="th">DP05_0037E</th>
-<th data-quarto-table-cell-role="th">DP05_0038E</th>
-<th data-quarto-table-cell-role="th">DP05_0039E</th>
-<th data-quarto-table-cell-role="th">DP05_0044E</th>
-<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">Total population</th>
+<th data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</th>
+<th data-quarto-table-cell-role="th">Median Age</th>
+<th data-quarto-table-cell-role="th">Race-White</th>
+<th data-quarto-table-cell-role="th">Race-Black</th>
+<th data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</th>
+<th data-quarto-table-cell-role="th">Race-Asian</th>
+<th data-quarto-table-cell-role="th">Hispanic or Latino</th>
 <th data-quarto-table-cell-role="th">RegionName</th>
 <th data-quarto-table-cell-role="th">Typical Home Value</th>
 </tr>
@@ -1201,7 +653,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>-0.000327</td>
 <td>-0.123824</td>
 <td>-0.027097</td>
-<td>0.217687</td>
+<td>0.047111</td>
 <td>Alabama</td>
 <td>0.038688</td>
 </tr>
@@ -1225,7 +677,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>0.009572</td>
 <td>0.054480</td>
 <td>0.015884</td>
-<td>-0.178100</td>
+<td>0.036934</td>
 <td>Alabama</td>
 <td>0.070360</td>
 </tr>
@@ -1249,7 +701,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>-0.010947</td>
 <td>0.067268</td>
 <td>0.040587</td>
-<td>-0.005625</td>
+<td>0.082710</td>
 <td>Alabama</td>
 <td>0.263465</td>
 </tr>
@@ -1273,7 +725,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>-0.002353</td>
 <td>-0.017318</td>
 <td>0.146484</td>
-<td>10.243876</td>
+<td>-0.125037</td>
 <td>Alabama</td>
 <td>0.076587</td>
 </tr>
@@ -1297,173 +749,46 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <td>0.139775</td>
 <td>0.012942</td>
 <td>-0.060828</td>
-<td>0.054155</td>
+<td>0.026241</td>
 <td>Alaska</td>
 <td>0.005789</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">199</td>
-<td>2022</td>
-<td>0.002299</td>
-<td>-0.012945</td>
-<td>-0.040358</td>
-<td>-0.228287</td>
-<td>-0.235682</td>
-<td>0.039527</td>
-<td>0.185354</td>
-<td>-0.089400</td>
-<td>0.011854</td>
-<td>...</td>
-<td>0.004454</td>
-<td>0.003820</td>
-<td>0.002564</td>
-<td>0.004535</td>
-<td>-0.387319</td>
-<td>0.073581</td>
-<td>-0.233665</td>
-<td>42.074760</td>
-<td>Wyoming</td>
-<td>0.083624</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">200</td>
-<td>2018</td>
-<td>0.021320</td>
-<td>0.018198</td>
-<td>0.049960</td>
-<td>0.151328</td>
-<td>0.030406</td>
-<td>0.112103</td>
-<td>-0.151330</td>
-<td>-0.025084</td>
-<td>-0.007725</td>
-<td>...</td>
-<td>0.012224</td>
-<td>0.006652</td>
-<td>-0.002941</td>
-<td>0.042915</td>
-<td>0.004893</td>
-<td>0.143195</td>
-<td>-0.033720</td>
-<td>0.598440</td>
-<td>District of Columbia</td>
-<td>0.055570</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">201</td>
-<td>2019</td>
-<td>0.014241</td>
-<td>-0.355454</td>
-<td>-0.490505</td>
-<td>-0.365204</td>
-<td>-0.869834</td>
-<td>0.977101</td>
-<td>-0.287304</td>
-<td>-0.701942</td>
-<td>0.298245</td>
-<td>...</td>
-<td>0.004689</td>
-<td>-0.008811</td>
-<td>0.011799</td>
-<td>0.011158</td>
-<td>0.002899</td>
-<td>-0.023810</td>
-<td>0.042995</td>
-<td>0.392450</td>
-<td>District of Columbia</td>
-<td>0.017659</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">202</td>
-<td>2021</td>
-<td>0.096015</td>
-<td>-0.010890</td>
-<td>0.155305</td>
-<td>-0.343210</td>
-<td>0.020759</td>
-<td>-0.059821</td>
-<td>-0.015675</td>
-<td>-0.257760</td>
-<td>-0.112117</td>
-<td>...</td>
-<td>-0.050583</td>
-<td>0.010000</td>
-<td>0.014577</td>
-<td>-0.154024</td>
-<td>-0.097916</td>
-<td>-0.320785</td>
-<td>-0.035861</td>
-<td>-0.005959</td>
-<td>District of Columbia</td>
-<td>0.097177</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">203</td>
-<td>2022</td>
-<td>0.023172</td>
-<td>0.000929</td>
-<td>-0.045818</td>
-<td>-0.211063</td>
-<td>-0.092319</td>
-<td>0.055245</td>
-<td>-0.370224</td>
-<td>0.098800</td>
-<td>-0.089982</td>
-<td>...</td>
-<td>0.002616</td>
-<td>-0.001100</td>
-<td>0.002874</td>
-<td>0.016235</td>
-<td>-0.023242</td>
-<td>1.443404</td>
-<td>0.009714</td>
-<td>8.276008</td>
-<td>District of Columbia</td>
-<td>-0.009417</td>
 </tr>
 </tbody>
 </table>
 
-<p>204 rows × 34 columns</p>
+<p>5 rows × 34 columns</p>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>final_data.to_csv(<span class="st">'./data/RecordData.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="79">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>final_data.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="79">
+<pre><code>(204, 34)</code></pre>
 </div>
-<div class="cell" data-execution_count="193">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>DP02colss<span class="op">=</span>[<span class="st">'DP02_0001E'</span>,<span class="st">'DP02_0002E'</span>,<span class="st">'DP02_0003E'</span>,<span class="st">'DP02_0007E'</span>,<span class="st">'DP02_0011E'</span>,<span class="st">'DP02_0037E'</span>,<span class="st">'DP02_0060E'</span>,<span class="st">'DP02_0061E'</span>,<span class="st">'DP02_0062E'</span>,<span class="st">'DP02_0063E'</span>,<span class="st">'DP02_0064E'</span>,<span class="st">'DP02_0065E'</span>]</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>DP03colss<span class="op">=</span>[<span class="st">'DP03_0026PE'</span>,<span class="st">'DP03_0005E'</span>,<span class="st">'DP03_0062E'</span>,<span class="st">'DP03_0063E'</span>,<span class="st">'DP03_0093E'</span>,<span class="st">'DP03_0094E'</span>]</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>DP04colss<span class="op">=</span>[<span class="st">'DP04_0002E'</span>,<span class="st">'DP04_0001E'</span>,<span class="st">'DP04_0037E'</span>,<span class="st">'DP04_0047E'</span>,<span class="st">'DP04_0134E'</span>]</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>DP05colss<span class="op">=</span>[<span class="st">'DP05_0001E'</span>,<span class="st">'DP05_0004E'</span>,<span class="st">'DP05_0018E'</span>,<span class="st">'DP05_0037E'</span>,<span class="st">'DP05_0038E'</span>,<span class="st">'DP05_0039E'</span>,<span class="st">'DP05_0044E'</span>,<span class="st">'DP05_0073E'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="194">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP02colss:</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="record-data-overview" class="level1">
+<h1>Record Data Overview</h1>
+<p>As you can see with the cleaned record data above, my data set has 204 rows and 34 columns. Two of the columns serve as an index, with the state and year as the unique identifiers. Each cell represents the percent change of the variable from the previous year. For example, the first row is Alabama-2018. This row represents the percent change from 2017 to 2018 for all the census predictor variables and the home value target variable. More data would be ideal for my analysis, but for the purposes of this project I will continue with the data I already wrangled. 31 features are a lot and I should definitely aim to cut this number down. More on this in the dimensionality reduction and data exploration tabs, but I start below.</p>
+<p>Now I will quickly look at the max of each column just to see if there are any obvious problems.</p>
+<div class="cell" data-execution_count="90">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>DP02colss<span class="op">=</span>[<span class="st">'DP02_0001E'</span>,<span class="st">'DP02_0002E'</span>,<span class="st">'DP02_0003E'</span>,<span class="st">'DP02_0007E'</span>,<span class="st">'DP02_0011E'</span>,<span class="st">'DP02_0037E'</span>,<span class="st">'DP02_0060E'</span>,<span class="st">'DP02_0061E'</span>,<span class="st">'DP02_0062E'</span>,<span class="st">'DP02_0063E'</span>,<span class="st">'DP02_0064E'</span>,<span class="st">'DP02_0065E'</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>DP03colss<span class="op">=</span>[<span class="st">'DP03_0026PE'</span>,<span class="st">'DP03_0005E'</span>,<span class="st">'DP03_0062E'</span>,<span class="st">'DP03_0063E'</span>,<span class="st">'DP03_0093E'</span>,<span class="st">'DP03_0094E'</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>DP04colss<span class="op">=</span>[<span class="st">'DP04_0002E'</span>,<span class="st">'DP04_0001E'</span>,<span class="st">'DP04_0037E'</span>,<span class="st">'DP04_0047E'</span>,<span class="st">'DP04_0134E'</span>]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>DP05colss<span class="op">=</span>[<span class="st">'DP05_0001E'</span>,<span class="st">'DP05_0004E'</span>,<span class="st">'DP05_0018E'</span>,<span class="st">'DP05_0037E'</span>,<span class="st">'DP05_0038E'</span>,<span class="st">'DP05_0039E'</span>,<span class="st">'DP05_0044E'</span>,<span class="st">'DP05_0071E'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="91">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP02colss:</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>0.0960146791508043
 0.08325965443347161
@@ -1479,9 +804,12 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 1.8600379486638907</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="195">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP03colss:</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="92">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP03colss:</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>0.08159905963183367
 0.9855738883335392
@@ -1491,9 +819,12 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 0.19923024054982807</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="196">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP04colss:</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="93">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP04colss:</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>0.0960146791508043
 0.10739311182290723
@@ -1502,9 +833,12 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 0.17613636363636354</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="197">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP05colss:</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="94">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name <span class="kw">in</span> DP05colss:</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(feature_df[name].<span class="bu">max</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>0.06371228802533757
 0.024340770791075217
@@ -1513,13 +847,13 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 0.9405508590128171
 1.598558282208589
 0.3942459396751741
-85.27326007326008</code></pre>
+0.7167422884813359</code></pre>
 </div>
 </div>
-<p>4.71179314694135 85.27326007326008</p>
-<p>We may need to drop some columns that are producing outliers.</p>
+<p>Looks like there are some obvious outliers, with one cell having a 470% increase in the metric. With the ACS data, for each measure they release to the public, they also release a margin of error. The margin of error can be high at times, explaining why some percent change values may be out of the ordinary. In the next tab I will dig deeper into the outliers.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

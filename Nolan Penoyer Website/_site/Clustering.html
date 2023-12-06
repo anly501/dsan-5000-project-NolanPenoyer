@@ -155,10 +155,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Decision Trees</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./ARM.html" rel="" target="">
- <span class="menu-text">ARM</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./Conclusions.html" rel="" target="">
  <span class="menu-text">Conclusions</span></a>
   </li>  
@@ -180,7 +176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#kmean" id="toc-kmean" class="nav-link active" data-scroll-target="#kmean">KMEAN</a></li>
   <li><a href="#dbsan" id="toc-dbsan" class="nav-link" data-scroll-target="#dbsan">DBSAN</a></li>
-  <li><a href="#hierarchial-clustering" id="toc-hierarchial-clustering" class="nav-link" data-scroll-target="#hierarchial-clustering">Hierarchial Clustering</a></li>
+  <li><a href="#hierarchical-clustering" id="toc-hierarchical-clustering" class="nav-link" data-scroll-target="#hierarchical-clustering">Hierarchical Clustering</a></li>
   <li><a href="#model-selection-methods" id="toc-model-selection-methods" class="nav-link" data-scroll-target="#model-selection-methods">Model Selection Methods</a></li>
   <li><a href="#data-selection" id="toc-data-selection" class="nav-link" data-scroll-target="#data-selection">Data Selection</a></li>
   <li><a href="#hyperparameter-tuning" id="toc-hyperparameter-tuning" class="nav-link" data-scroll-target="#hyperparameter-tuning">Hyperparameter Tuning</a></li>
@@ -212,26 +208,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Clustering my data may reveal if certain states or years may be grouped together. This can reveal trends in my data set, like if certain regions are developing in similar ways.</p>
 <section id="kmean" class="level1">
 <h1>KMEAN</h1>
-<p>K-means Clustering seperates an unlabeled dataset into distinct clusters. In this method, the parameter K signifies the predetermined number of clusters to be formed during the process, or another way to say it, the number of centroids (means).For instance, if K=2, the data will be grouped into two clusters, and if K=3, there will be three clusters and three centroids, ect. Every data point is then assigned to each of the clusters to reduce the in-cluster sum of squares<br> <br> The process goes as follows. First you initialize the number of random centroids. You can determine this figure with model selection methods which I will talk about below. Then, you compute the distance from each data point to each centroid and assign the point to the nearest centroid. Then, you compute the centroids as the mean points of the cluster and repeat computing distance, reassigning points, recomputing centroids until convergence.</p>
+<p>K-means Clustering separates an unlabeled dataset into distinct clusters. In this method, the parameter K signifies the predetermined number of clusters to be formed during the process, or another way to say it, the number of centroids (means).For instance, if K=2, the data will be grouped into two clusters, and if K=3, there will be three clusters and three centroids, ect. Every data point is then assigned to each of the clusters to reduce the in-cluster sum of squares<br> <br> The process goes as follows. First you initialize the number of random centroids. You can determine this figure with model selection methods which I will talk about below. Then, you compute the distance from each data point to each centroid and assign the point to the nearest centroid. Then, you compute the centroids as the mean points of the cluster and repeat computing distance, reassigning points, recomputing centroids until convergence.</p>
 </section>
 <section id="dbsan" class="level1">
 <h1>DBSAN</h1>
-<p>While K-means clustering is better for normal shaped data, density based clustering is more efficient for oddly shaped data. The underlying concept is that a cluster in the data space is characterized by a region with high point density, and it is separated from other clusters by regions with low point density. The two parameters required for DBSCAN are epsilon and mininum points, where epsilon is basicially the maximum distance from another point for two data points to be considered “neighbors”, and mininum points is the mininum number of neighbors a data point must have to be considered a core point.<br> <br> The process goes as follows. Find the neighbor points and identify the core points. For each core point, assign it to a cluster if its not already. Then you find all the connected points and assign them to the same cluster as the core point. Its like a chain, in that if there are a,b, and c data points, if a and b are neighbors, and c and b are neighbors, then a and c are then neighbors. Then you iterate through the unvisited points again.</p>
+<p>While K-means clustering is better for normal shaped data, density based clustering is more efficient for oddly shaped data. The underlying concept is that a cluster in the data space is characterized by a region with high point density, and it is separated from other clusters by regions with low point density. The two parameters required for DBSCAN are epsilon and minimum points, where epsilon is basically the maximum distance from another point for two data points to be considered “neighbors”, and minimum points is the minimum number of neighbors a data point must have to be considered a core point.<br> <br> The process goes as follows. Find the neighbor points and identify the core points. For each core point, assign it to a cluster if its not already. Then you find all the connected points and assign them to the same cluster as the core point. Its like a chain, in that if there are a,b, and c data points, if a and b are neighbors, and c and b are neighbors, then a and c are then neighbors. Then you iterate through the unvisited points again.</p>
 </section>
-<section id="hierarchial-clustering" class="level1">
-<h1>Hierarchial Clustering</h1>
-<p>Hierarchial clustering builds a hierarchy of clusters in the from of a dendogram, allowing us to visualize the relationships between data points. There are top down and bottom up algorithms, where bottom up treats each data point as a single cluster then merges the clusters together until there is one big cluster. Top down does the opposite.</p>
-<p>The bottom up process goes as follows. Assign each data point as a single cluster. Then, find the closet pair of clusters and make them one cluster. Then, find the two closest clusters and make them one cluster. Repeat merging the clusters together until one cluster remains</p>
+<section id="hierarchical-clustering" class="level1">
+<h1>Hierarchical Clustering</h1>
+<p>Hierarchical clustering builds a hierarchy of clusters in the from of a dendrogram, allowing us to visualize the relationships between data points. There are top down and bottom up algorithms, where bottom up treats each data point as a single cluster then merges the clusters together until there is one big cluster. Top down does the opposite.</p>
+<p>The bottom up process goes as follows. Assign each data point as a single cluster. Then, find the closet pair of clusters and make them one cluster. Then, find the two closest clusters and make them one cluster. Repeat merging the clusters together until one cluster remains.</p>
 </section>
 <section id="model-selection-methods" class="level1">
 <h1>Model Selection Methods</h1>
 <p>These methods aid in determining the optimal number of clusters.</p>
-<p>Elbow: Inertia is the sum of squared distance of samples to their closest cluster, or put simply a measure of how “well clustered” a datset is. You want low inertia and low k. In the elbow method, you plut inertia against the number of clusters and find the k value where the decrease in inertia begins to signficantly slow.</p>
-<p>Silhouette Score: The sihouette score measures similarity of an object to its own cluster in comparison to other clusters. A higher silhouette score indicates well-separated clusters and helps you determine the number of clusters.</p>
+<p>Elbow: Inertia is the sum of squared distance of samples to their closest cluster, or put simply a measure of how “well clustered” a dataset is. You want low inertia and low k. In the elbow method, you plot inertia against the number of clusters and find the k value where the decrease in inertia begins to significantly slow.</p>
+<p>Silhouette Score: The silhouette score measures similarity of an object to its own cluster in comparison to other clusters. A higher silhouette score indicates well-separated clusters and helps you determine the number of clusters.</p>
 </section>
 <section id="data-selection" class="level1">
 <h1>Data Selection</h1>
-<div class="cell" data-execution_count="5">
+<div class="cell" data-execution_count="2">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
@@ -239,12 +237,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> AgglomerativeClustering</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>record<span class="op">=</span>pd.read_csv(<span class="st">'data/RecordData.csv'</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>record<span class="op">=</span>record.drop([<span class="st">'Year'</span>,<span class="st">'DP05_0073E'</span>,<span class="st">'RegionName'</span>],axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>record.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>record<span class="op">=</span>pd.read_csv(<span class="st">'data/RecordData.csv'</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>record<span class="op">=</span>record.drop([<span class="st">'Year'</span>,<span class="st">'RegionName'</span>],axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>record.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
@@ -253,26 +250,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">DP02_0001E</th>
-<th data-quarto-table-cell-role="th">DP02_0002E</th>
-<th data-quarto-table-cell-role="th">DP02_0003E</th>
-<th data-quarto-table-cell-role="th">DP02_0007E</th>
-<th data-quarto-table-cell-role="th">DP02_0011E</th>
-<th data-quarto-table-cell-role="th">DP02_0037E</th>
-<th data-quarto-table-cell-role="th">DP02_0060E</th>
-<th data-quarto-table-cell-role="th">DP02_0061E</th>
-<th data-quarto-table-cell-role="th">DP02_0062E</th>
-<th data-quarto-table-cell-role="th">DP02_0063E</th>
+<th data-quarto-table-cell-role="th">Total households</th>
+<th data-quarto-table-cell-role="th">Married couple households</th>
+<th data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</th>
+<th data-quarto-table-cell-role="th">Less than 9th grade</th>
+<th data-quarto-table-cell-role="th">9th to 12th grade,no diploma</th>
+<th data-quarto-table-cell-role="th">High school graduate (includes equivalency)</th>
+<th data-quarto-table-cell-role="th">Some college, no degree</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">DP04_0047E</th>
-<th data-quarto-table-cell-role="th">DP04_0134E</th>
-<th data-quarto-table-cell-role="th">DP05_0001E</th>
-<th data-quarto-table-cell-role="th">DP05_0004E</th>
-<th data-quarto-table-cell-role="th">DP05_0018E</th>
-<th data-quarto-table-cell-role="th">DP05_0037E</th>
-<th data-quarto-table-cell-role="th">DP05_0038E</th>
-<th data-quarto-table-cell-role="th">DP05_0039E</th>
-<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">Mean Rent Paid</th>
+<th data-quarto-table-cell-role="th">Total population</th>
+<th data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</th>
+<th data-quarto-table-cell-role="th">Median Age</th>
+<th data-quarto-table-cell-role="th">Race-White</th>
+<th data-quarto-table-cell-role="th">Race-Black</th>
+<th data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</th>
+<th data-quarto-table-cell-role="th">Race-Asian</th>
+<th data-quarto-table-cell-role="th">Hispanic or Latino</th>
 <th data-quarto-table-cell-role="th">Typical Home Value</th>
 </tr>
 </thead>
@@ -290,7 +287,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.018174</td>
 <td>0.033732</td>
 <td>...</td>
-<td>0.007581</td>
 <td>0.050667</td>
 <td>0.002692</td>
 <td>0.003198</td>
@@ -299,6 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.000327</td>
 <td>-0.123824</td>
 <td>-0.027097</td>
+<td>0.047111</td>
 <td>0.038688</td>
 </tr>
 <tr class="even">
@@ -314,7 +311,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.439418</td>
 <td>1.429793</td>
 <td>...</td>
-<td>-0.000968</td>
 <td>0.024112</td>
 <td>0.003133</td>
 <td>-0.006376</td>
@@ -323,6 +319,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.009572</td>
 <td>0.054480</td>
 <td>0.015884</td>
+<td>0.036934</td>
 <td>0.070360</td>
 </tr>
 <tr class="odd">
@@ -338,7 +335,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.038532</td>
 <td>0.007408</td>
 <td>...</td>
-<td>-0.004602</td>
 <td>0.066914</td>
 <td>0.027878</td>
 <td>0.008556</td>
@@ -347,6 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.010947</td>
 <td>0.067268</td>
 <td>0.040587</td>
+<td>0.082710</td>
 <td>0.263465</td>
 </tr>
 <tr class="even">
@@ -362,7 +359,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.020504</td>
 <td>0.014854</td>
 <td>...</td>
-<td>0.017788</td>
 <td>0.060395</td>
 <td>0.006829</td>
 <td>-0.001060</td>
@@ -371,6 +367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.002353</td>
 <td>-0.017318</td>
 <td>0.146484</td>
+<td>-0.125037</td>
 <td>0.076587</td>
 </tr>
 <tr class="odd">
@@ -386,7 +383,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.017837</td>
 <td>-0.065209</td>
 <td>...</td>
-<td>-0.043262</td>
 <td>-0.019983</td>
 <td>-0.003186</td>
 <td>-0.009174</td>
@@ -395,51 +391,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.139775</td>
 <td>0.012942</td>
 <td>-0.060828</td>
+<td>0.026241</td>
 <td>0.005789</td>
 </tr>
 </tbody>
 </table>
 
-<p>5 rows × 31 columns</p>
+<p>5 rows × 32 columns</p>
 </div>
 </div>
 </div>
 </section>
 <section id="hyperparameter-tuning" class="level1">
 <h1>Hyperparameter Tuning</h1>
-<div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scaler<span class="op">=</span>StandardScaler()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>scaled<span class="op">=</span>scaler.fit_transform(record)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>components <span class="op">=</span> pca.fit_transform(scaled)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>agg_cluster <span class="op">=</span> AgglomerativeClustering(n_clusters<span class="op">=</span><span class="dv">5</span>, linkage<span class="op">=</span><span class="st">'ward'</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>agg_labels <span class="op">=</span> agg_cluster.fit_predict(record)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(components[:, <span class="dv">0</span>], components[:, <span class="dv">1</span>], c<span class="op">=</span>agg_labels, cmap<span class="op">=</span><span class="st">'plasma'</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Agglomerative Clustering'</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Principal Component 1'</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Principal Component 2'</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>plt.colorbar(label<span class="op">=</span><span class="st">'Cluster'</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="Clustering_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
-</div>
-</div>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>inertia <span class="op">=</span> []</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>):</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    kmeans.fit(record)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    inertia.append(kmeans.inertia_)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>), inertia, marker<span class="op">=</span><span class="st">'o'</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Clusters'</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Inertia'</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Elbow Method for Optimal k'</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>scaler<span class="op">=</span>StandardScaler()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>scaled<span class="op">=</span>scaler.fit_transform(record)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>components <span class="op">=</span> pca.fit_transform(scaled)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>agg_cluster <span class="op">=</span> AgglomerativeClustering(n_clusters<span class="op">=</span><span class="dv">5</span>, linkage<span class="op">=</span><span class="st">'ward'</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>agg_labels <span class="op">=</span> agg_cluster.fit_predict(record)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.scatter(components[:, <span class="dv">0</span>], components[:, <span class="dv">1</span>], c<span class="op">=</span>agg_labels, cmap<span class="op">=</span><span class="st">'plasma'</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Agglomerative Clustering'</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Principal Component 1'</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Principal Component 2'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.colorbar(label<span class="op">=</span><span class="st">'Cluster'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="Clustering_files/figure-html/cell-3-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>inertia <span class="op">=</span> []</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    kmeans.fit(record)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    inertia.append(kmeans.inertia_)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>), inertia, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Clusters'</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Inertia'</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Elbow Method for Optimal k'</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>c:\Users\npeno\anaconda3\Lib\site-packages\sklearn\cluster\_kmeans.py:1412: FutureWarning: The default value of `n_init` will change from 10 to 'auto' in 1.4. Set the value of `n_init` explicitly to suppress the warning
   super()._check_params_vs_input(X, default_n_init=10)
@@ -483,27 +484,30 @@ c:\Users\npeno\anaconda3\Lib\site-packages\sklearn\cluster\_kmeans.py:1436: User
   warnings.warn(</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="Clustering_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
+<p><img src="Clustering_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dbscan <span class="op">=</span> DBSCAN(eps<span class="op">=</span><span class="fl">0.5</span>, min_samples<span class="op">=</span><span class="dv">5</span>) </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dbscan_labels <span class="op">=</span> dbscan.fit_predict(scaled)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(components[:, <span class="dv">0</span>], components[:, <span class="dv">1</span>], c<span class="op">=</span>dbscan_labels, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DBSCAN Clustering'</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Principal Component 1'</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Principal Component 2'</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.colorbar(label<span class="op">=</span><span class="st">'Cluster'</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="5">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dbscan <span class="op">=</span> DBSCAN(eps<span class="op">=</span><span class="fl">0.5</span>, min_samples<span class="op">=</span><span class="dv">5</span>) </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dbscan_labels <span class="op">=</span> dbscan.fit_predict(scaled)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(components[:, <span class="dv">0</span>], components[:, <span class="dv">1</span>], c<span class="op">=</span>dbscan_labels, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'DBSCAN Clustering'</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Principal Component 1'</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Principal Component 2'</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.colorbar(label<span class="op">=</span><span class="st">'Cluster'</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
-<p><img src="Clustering_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+<p><img src="Clustering_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 </section>
 <section id="results" class="level1">
 <h1>Results</h1>
-<p>It seems that hierachial clustering had the most meaningful results.I think there are a lot of connections to be made in my data because it is based on years and states. Obviously some years there will be higher percent changes overall, and states close to each other most likely move in similar directions</p>
+<p>It seems that hierarchical clustering had the most meaningful results. I think there are a lot of connections to be made in my data because it is based on years and states. Obviously some years there will be higher percent changes overall, and states close to each other most likely move in similar directions.</p>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>

@@ -118,10 +118,6 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Decision Trees</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./ARM.html" rel="" target="">
- <span class="menu-text">ARM</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link active" href="./Conclusions.html" rel="" target="" aria-current="page">
  <span class="menu-text">Conclusions</span></a>
   </li>  
@@ -144,6 +140,10 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<p>I discovered that we can accurately predict what states will have home values that increase or decrease significantly from year to year based on census data. These are promising results, as we can see what states to buy property in just looking at census data that comes out every year. With the regression task, we tried to predict an actual number that represented the percent change of home values after plugging in the census data. With a mean squared error of only .0045, this model shows promise of being useful for its purpose.</p>
+<p>Missing the 2020 year in my dataset was detrimental for my analysis. The percent change from 2019-2021 is higher than other years because it is a longer time period. Also, some of the margin of errors for my census data were high, so not all the data may be accurate. A lot of my variables were correlated as seen with the exploratory data analysis and PCA, but I did not want to remove any data that could be valuable. Same goes for the many outliers in my dataset.</p>
+<p>In the future, I would like to gather as much data as possible so I can freely remove outliers. I also want to take the time to really decide what few variables impact home values the most. This will help me simplify the models, helping with both interpretation and accuracy. Also, I want to focus on smaller geographic regions and explore other geography hierarchies, as a state is a large area.</p>
+<p>I learned a lot from this project. Although I am not ready to buy a home just yet, I am almost there 😊.</p>
 
 
 

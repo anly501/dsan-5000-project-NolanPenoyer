@@ -155,10 +155,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Decision Trees</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./ARM.html" rel="" target="">
- <span class="menu-text">ARM</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./Conclusions.html" rel="" target="">
  <span class="menu-text">Conclusions</span></a>
   </li>  
@@ -174,7 +170,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#descriptive-statistics" id="toc-descriptive-statistics" class="nav-link active" data-scroll-target="#descriptive-statistics">Descriptive Statistics</a></li>
+  <li><a href="#visualizations" id="toc-visualizations" class="nav-link" data-scroll-target="#visualizations">Visualizations</a></li>
+  <li><a href="#outliers" id="toc-outliers" class="nav-link" data-scroll-target="#outliers">Outliers</a></li>
+  <li><a href="#correlation" id="toc-correlation" class="nav-link" data-scroll-target="#correlation">Correlation</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -196,15 +201,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell" data-execution_count="2">
+<p>Now I will attempt to get a better understanding of my record data through exploratory data analysis. By calculating and reporting basic summary statistics, I will know the central tendency, spread, and extremes of my variables. This can reveal flaws or inaccuracies in the data and provide us with insight into the distribution of the data. I will also create some data visualizations. There is a plethora of graphs I can make with all the variables I have. Since I already know what algorithms I will be using and what I want to achieve with my models, I will just create a few to show some general relationships and inspire other rabbit holes I could go down if I choose. Like I said before, some of my variables are closely related and correlated, so now we will finally visualize these correlations. Lastly, I will examine the outliers I have and decide what actions I should take with the outliers.</p>
+<section id="descriptive-statistics" class="level1">
+<h1>Descriptive Statistics</h1>
+<div class="cell" data-execution_count="41">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'./data/RecordData.csv'</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'./data/RecordData.csv'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="41">
 <div>
 
 
@@ -213,24 +223,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">DP02_0001E</th>
-<th data-quarto-table-cell-role="th">DP02_0002E</th>
-<th data-quarto-table-cell-role="th">DP02_0003E</th>
-<th data-quarto-table-cell-role="th">DP02_0007E</th>
-<th data-quarto-table-cell-role="th">DP02_0011E</th>
-<th data-quarto-table-cell-role="th">DP02_0037E</th>
-<th data-quarto-table-cell-role="th">DP02_0060E</th>
-<th data-quarto-table-cell-role="th">DP02_0061E</th>
-<th data-quarto-table-cell-role="th">DP02_0062E</th>
+<th data-quarto-table-cell-role="th">Total households</th>
+<th data-quarto-table-cell-role="th">Married couple households</th>
+<th data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</th>
+<th data-quarto-table-cell-role="th">Less than 9th grade</th>
+<th data-quarto-table-cell-role="th">9th to 12th grade,no diploma</th>
+<th data-quarto-table-cell-role="th">High school graduate (includes equivalency)</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">DP05_0001E</th>
-<th data-quarto-table-cell-role="th">DP05_0004E</th>
-<th data-quarto-table-cell-role="th">DP05_0018E</th>
-<th data-quarto-table-cell-role="th">DP05_0037E</th>
-<th data-quarto-table-cell-role="th">DP05_0038E</th>
-<th data-quarto-table-cell-role="th">DP05_0039E</th>
-<th data-quarto-table-cell-role="th">DP05_0044E</th>
-<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">Total population</th>
+<th data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</th>
+<th data-quarto-table-cell-role="th">Median Age</th>
+<th data-quarto-table-cell-role="th">Race-White</th>
+<th data-quarto-table-cell-role="th">Race-Black</th>
+<th data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</th>
+<th data-quarto-table-cell-role="th">Race-Asian</th>
+<th data-quarto-table-cell-role="th">Hispanic or Latino</th>
 <th data-quarto-table-cell-role="th">RegionName</th>
 <th data-quarto-table-cell-role="th">Typical Home Value</th>
 </tr>
@@ -256,7 +266,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.000327</td>
 <td>-0.123824</td>
 <td>-0.027097</td>
-<td>0.217687</td>
+<td>0.047111</td>
 <td>Alabama</td>
 <td>0.038688</td>
 </tr>
@@ -280,7 +290,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.009572</td>
 <td>0.054480</td>
 <td>0.015884</td>
-<td>-0.178100</td>
+<td>0.036934</td>
 <td>Alabama</td>
 <td>0.070360</td>
 </tr>
@@ -304,7 +314,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.010947</td>
 <td>0.067268</td>
 <td>0.040587</td>
-<td>-0.005625</td>
+<td>0.082710</td>
 <td>Alabama</td>
 <td>0.263465</td>
 </tr>
@@ -328,7 +338,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.002353</td>
 <td>-0.017318</td>
 <td>0.146484</td>
-<td>10.243876</td>
+<td>-0.125037</td>
 <td>Alabama</td>
 <td>0.076587</td>
 </tr>
@@ -352,7 +362,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.139775</td>
 <td>0.012942</td>
 <td>-0.060828</td>
-<td>0.054155</td>
+<td>0.026241</td>
 <td>Alaska</td>
 <td>0.005789</td>
 </tr>
@@ -363,9 +373,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell" data-execution_count="15">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.max_columns'</span>,<span class="va">None</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.describe(include<span class="op">=</span><span class="st">'all'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 
 
@@ -374,25 +388,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">DP02_0001E</th>
-<th data-quarto-table-cell-role="th">DP02_0002E</th>
-<th data-quarto-table-cell-role="th">DP02_0003E</th>
-<th data-quarto-table-cell-role="th">DP02_0007E</th>
-<th data-quarto-table-cell-role="th">DP02_0011E</th>
-<th data-quarto-table-cell-role="th">DP02_0037E</th>
-<th data-quarto-table-cell-role="th">DP02_0060E</th>
-<th data-quarto-table-cell-role="th">DP02_0061E</th>
-<th data-quarto-table-cell-role="th">DP02_0062E</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">DP04_0134E</th>
-<th data-quarto-table-cell-role="th">DP05_0001E</th>
-<th data-quarto-table-cell-role="th">DP05_0004E</th>
-<th data-quarto-table-cell-role="th">DP05_0018E</th>
-<th data-quarto-table-cell-role="th">DP05_0037E</th>
-<th data-quarto-table-cell-role="th">DP05_0038E</th>
-<th data-quarto-table-cell-role="th">DP05_0039E</th>
-<th data-quarto-table-cell-role="th">DP05_0044E</th>
-<th data-quarto-table-cell-role="th">DP05_0073E</th>
+<th data-quarto-table-cell-role="th">Total households</th>
+<th data-quarto-table-cell-role="th">Married couple households</th>
+<th data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</th>
+<th data-quarto-table-cell-role="th">Less than 9th grade</th>
+<th data-quarto-table-cell-role="th">9th to 12th grade,no diploma</th>
+<th data-quarto-table-cell-role="th">High school graduate (includes equivalency)</th>
+<th data-quarto-table-cell-role="th">Some college, no degree</th>
+<th data-quarto-table-cell-role="th">Associates degree</th>
+<th data-quarto-table-cell-role="th">Bachelors degree</th>
+<th data-quarto-table-cell-role="th">Number of people employed</th>
+<th data-quarto-table-cell-role="th">Number of people unemployed</th>
+<th data-quarto-table-cell-role="th">Median Household Income</th>
+<th data-quarto-table-cell-role="th">Mean Household Income</th>
+<th data-quarto-table-cell-role="th">Median earnings for male full-time, year-round workers</th>
+<th data-quarto-table-cell-role="th">Median earnings for female full-time, year-round workers</th>
+<th data-quarto-table-cell-role="th">Occupied Housing Units</th>
+<th data-quarto-table-cell-role="th">Total Housing Units</th>
+<th data-quarto-table-cell-role="th">Median Rooms</th>
+<th data-quarto-table-cell-role="th">Renter Occupied Housing Units</th>
+<th data-quarto-table-cell-role="th">Mean Rent Paid</th>
+<th data-quarto-table-cell-role="th">Total population</th>
+<th data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</th>
+<th data-quarto-table-cell-role="th">Median Age</th>
+<th data-quarto-table-cell-role="th">Race-White</th>
+<th data-quarto-table-cell-role="th">Race-Black</th>
+<th data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</th>
+<th data-quarto-table-cell-role="th">Race-Asian</th>
+<th data-quarto-table-cell-role="th">Hispanic or Latino</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
 <th data-quarto-table-cell-role="th">Typical Home Value</th>
 </tr>
 </thead>
@@ -409,7 +436,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>204.000000</td>
 <td>204.000000</td>
 <td>204.000000</td>
-<td>...</td>
 <td>204.000000</td>
 <td>204.000000</td>
 <td>204.000000</td>
@@ -419,9 +445,134 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>204.000000</td>
 <td>204.000000</td>
 <td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204.000000</td>
+<td>204</td>
 <td>204.000000</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">unique</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>51</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">top</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>Alabama</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">freq</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>4</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
 <td data-quarto-table-cell-role="th">mean</td>
 <td>2020.000000</td>
 <td>0.020044</td>
@@ -433,7 +584,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.109497</td>
 <td>-0.220982</td>
 <td>0.093385</td>
-<td>...</td>
+<td>0.349233</td>
+<td>-0.113733</td>
+<td>0.205185</td>
+<td>0.012061</td>
+<td>-0.022911</td>
+<td>0.054935</td>
+<td>0.056360</td>
+<td>0.049179</td>
+<td>0.053833</td>
+<td>0.020044</td>
+<td>0.010245</td>
+<td>0.003344</td>
+<td>0.008161</td>
 <td>0.056447</td>
 <td>0.006469</td>
 <td>0.002941</td>
@@ -442,10 +605,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.001579</td>
 <td>0.059462</td>
 <td>0.019590</td>
-<td>4.530851</td>
+<td>0.019030</td>
+<td>NaN</td>
 <td>0.110084</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td data-quarto-table-cell-role="th">std</td>
 <td>1.585028</td>
 <td>0.017131</td>
@@ -457,7 +621,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.198461</td>
 <td>0.329615</td>
 <td>0.215643</td>
-<td>...</td>
+<td>0.653535</td>
+<td>0.248473</td>
+<td>0.332987</td>
+<td>0.023825</td>
+<td>0.253585</td>
+<td>0.029235</td>
+<td>0.025530</td>
+<td>0.039958</td>
+<td>0.044326</td>
+<td>0.017131</td>
+<td>0.012175</td>
+<td>0.012598</td>
+<td>0.030682</td>
 <td>0.033730</td>
 <td>0.010885</td>
 <td>0.007600</td>
@@ -466,10 +642,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.112276</td>
 <td>0.268675</td>
 <td>0.078313</td>
-<td>11.884183</td>
+<td>0.110523</td>
+<td>NaN</td>
 <td>0.099373</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td data-quarto-table-cell-role="th">min</td>
 <td>2018.000000</td>
 <td>-0.009240</td>
@@ -481,7 +658,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.656774</td>
 <td>-0.870279</td>
 <td>-0.112117</td>
-<td>...</td>
+<td>-0.144863</td>
+<td>-0.869612</td>
+<td>-0.246902</td>
+<td>-0.083615</td>
+<td>-0.522982</td>
+<td>-0.023606</td>
+<td>-0.019416</td>
+<td>-0.050021</td>
+<td>-0.069051</td>
+<td>-0.009240</td>
+<td>-0.040806</td>
+<td>-0.050000</td>
+<td>-0.073401</td>
 <td>-0.019983</td>
 <td>-0.050583</td>
 <td>-0.020735</td>
@@ -490,10 +679,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.387319</td>
 <td>-0.578552</td>
 <td>-0.274559</td>
-<td>-0.451586</td>
+<td>-0.476645</td>
+<td>NaN</td>
 <td>-0.016960</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td data-quarto-table-cell-role="th">25%</td>
 <td>2018.750000</td>
 <td>0.009339</td>
@@ -505,7 +695,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.161193</td>
 <td>-0.355393</td>
 <td>-0.013111</td>
-<td>...</td>
+<td>-0.016380</td>
+<td>-0.142606</td>
+<td>0.023646</td>
+<td>-0.001067</td>
+<td>-0.169444</td>
+<td>0.034074</td>
+<td>0.038350</td>
+<td>0.019872</td>
+<td>0.024355</td>
+<td>0.009339</td>
+<td>0.004823</td>
+<td>0.000000</td>
+<td>-0.009801</td>
 <td>0.031688</td>
 <td>-0.000028</td>
 <td>-0.001061</td>
@@ -514,10 +716,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.032278</td>
 <td>-0.078743</td>
 <td>-0.013964</td>
-<td>-0.009074</td>
+<td>0.000514</td>
+<td>NaN</td>
 <td>0.049067</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td data-quarto-table-cell-role="th">50%</td>
 <td>2020.000000</td>
 <td>0.016837</td>
@@ -529,7 +732,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.047421</td>
 <td>-0.056749</td>
 <td>0.005985</td>
-<td>...</td>
+<td>0.014486</td>
+<td>0.010017</td>
+<td>0.051750</td>
+<td>0.010269</td>
+<td>-0.067010</td>
+<td>0.054701</td>
+<td>0.051641</td>
+<td>0.043743</td>
+<td>0.047357</td>
+<td>0.016837</td>
+<td>0.007647</td>
+<td>0.000000</td>
+<td>0.007864</td>
 <td>0.052233</td>
 <td>0.004786</td>
 <td>0.002001</td>
@@ -538,10 +753,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.004109</td>
 <td>0.025383</td>
 <td>0.017288</td>
-<td>0.078421</td>
+<td>0.025703</td>
+<td>NaN</td>
 <td>0.066658</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td data-quarto-table-cell-role="th">75%</td>
 <td>2021.250000</td>
 <td>0.025940</td>
@@ -553,7 +769,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.011528</td>
 <td>-0.004048</td>
 <td>0.052998</td>
-<td>...</td>
+<td>0.231572</td>
+<td>0.035628</td>
+<td>0.153283</td>
+<td>0.025831</td>
+<td>0.052464</td>
+<td>0.070556</td>
+<td>0.071981</td>
+<td>0.073978</td>
+<td>0.077146</td>
+<td>0.025940</td>
+<td>0.013986</td>
+<td>0.016737</td>
+<td>0.025262</td>
 <td>0.078260</td>
 <td>0.012023</td>
 <td>0.007316</td>
@@ -562,10 +790,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.026074</td>
 <td>0.104096</td>
 <td>0.049673</td>
-<td>1.078422</td>
+<td>0.045049</td>
+<td>NaN</td>
 <td>0.135000</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td data-quarto-table-cell-role="th">max</td>
 <td>2022.000000</td>
 <td>0.096015</td>
@@ -577,7 +806,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.583672</td>
 <td>0.233134</td>
 <td>1.166320</td>
-<td>...</td>
+<td>3.713579</td>
+<td>0.200963</td>
+<td>1.860038</td>
+<td>0.081599</td>
+<td>0.985574</td>
+<td>0.155899</td>
+<td>0.139031</td>
+<td>0.187938</td>
+<td>0.199230</td>
+<td>0.096015</td>
+<td>0.107393</td>
+<td>0.039216</td>
+<td>0.130424</td>
 <td>0.176136</td>
 <td>0.063712</td>
 <td>0.024341</td>
@@ -586,138 +827,171 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.940551</td>
 <td>1.598558</td>
 <td>0.394246</td>
-<td>85.273260</td>
+<td>0.716742</td>
+<td>NaN</td>
 <td>0.576048</td>
 </tr>
 </tbody>
 </table>
 
-<p>8 rows × 33 columns</p>
 </div>
 </div>
 </div>
-<p>As you can see there may be some problematic columns that we may not want to use in our analysis. For now lest drop the DP05_0073E as the standard deviation is very high which may indicate incorrectly measured data.</p>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>df.drop(<span class="st">'DP05_0073E'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Some of the more niche variables, Number of women 15 to 50 years old who had a birth in the past 12 months, seem to be suspect as they have some very high maxes and standard deviation. We may just remove these columns completely later.</p>
+<div class="cell" data-execution_count="16">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pd.reset_option(<span class="st">'all'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
+</section>
+<section id="visualizations" class="level1">
+<h1>Visualizations</h1>
+<p>I’ll start by just choosing a variable and state to compare against the target variable to find some relationships.</p>
 <div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Alabama_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'Alabama'</span>]</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'Typical Home Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value in Alabama"</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Typical Home Value Percent Change"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Alabama_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'Alabama'</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'blue'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'Number of people employed'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'s'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'green'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in Alabama"</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="DataExploration_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>These two variables almost seem to be negatively correlated. This is the opposite of what I expected as I usually equate more people employed to a stronger economy and higher home prices. Let us see these two relationships in some other states.</p>
+<div class="cell" data-execution_count="22">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>NewYork_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'New York'</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'blue'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'Number of people employed'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'s'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'green'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in New York"</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.plot(Alabama_data[<span class="st">'Year'</span>], Alabama_data[<span class="st">'DP03_0026PE'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in Alabama"</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<p>We see the same trends in New York as well.</p>
+<div class="cell" data-execution_count="24">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Michigan_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'Michigan'</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'blue'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'Number of people employed'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'s'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>, color<span class="op">=</span><span class="st">'green'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in Michigan"</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>NewYork_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'New York'</span>]</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'Typical Home Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value in New York"</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Typical Home Value Percent Change"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Again we see it here. This is why EDA is crucial if you would like to uncover hidden truths about the data. Although we would guess employment and home value were positively correlated, this is not the case here. This may be due to COVID turning the world on its head as many unprecedented changes happened during that time. This could be detrimental since I want to predict home values under normal conditions.</p>
+<p>Now I will make some box plots of some variables with potentially problematic values, prepping for the next section.</p>
+<div class="cell" data-execution_count="35">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'Some college, no degree'</span>]], color<span class="op">=</span><span class="st">'skyblue'</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plot of Percent Change in People with Some College, No Degree'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percent Change'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>plt.plot(NewYork_data[<span class="st">'Year'</span>], NewYork_data[<span class="st">'DP03_0026PE'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in NewYork"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="29">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">'whitegrid'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'High school graduate (includes equivalency)'</span>]], color<span class="op">=</span><span class="st">'skyblue'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plot of Percent Change in High School Graduates (includes equivalency)'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percent Change'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Michigan_data <span class="op">=</span> df[df[<span class="st">'RegionName'</span>] <span class="op">==</span> <span class="st">'Michigan'</span>]</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'Typical Home Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value in Michigan"</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Typical Home Value Percent Change"</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="36">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">'whitegrid'</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'Number of women 15 to 50 years old who had a birth in the past 12 months'</span>]], color<span class="op">=</span><span class="st">'skyblue'</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plot of Percent Change in Number of Women 15 to 50 years Old Who Had a Birth in the Past 12 months'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percent Change'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'Typical Home Value'</span>], label<span class="op">=</span><span class="st">'Typical Home Value'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plt.plot(Michigan_data[<span class="st">'Year'</span>], Michigan_data[<span class="st">'DP03_0026PE'</span>], label<span class="op">=</span><span class="st">'Num People Employed'</span>, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Percent Change of Typical Home Value and Number of People Employed in NewYork"</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Year"</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Percent Change"</span>)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="39">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'High school graduate (includes equivalency)'</span>]], color<span class="op">=</span><span class="st">'skyblue'</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plot of Highschool Graduate Percent Change'</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percent Change'</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'DP02_0062E'</span>]])</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plots of Goals For Highschool Graduate Changes'</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="40">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'Typical Home Value'</span>]], color<span class="op">=</span><span class="st">'skyblue'</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'TBox Plot of ypical Home Value Percent Change'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percent Change'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
 <p><img src="DataExploration_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<div class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'DP04_0002E'</span>]])</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plots of Goals For Occupied Housing Units Changes'</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="DataExploration_files/figure-html/cell-13-output-1.png" class="img-fluid"></p>
+<p>As you can see, a reoccurring theme with these box plots are the many outliers, even with my target variable, especially a few data points that deviate very far from the median. I do not want to get rid of most of the outliers because I think they still have value, but the problematic points need to be removed so my analysis is not negatively affected.</p>
+</section>
+<section id="outliers" class="level1">
+<h1>Outliers</h1>
+<p>Here I will make a data frame that detects outliers in each column that have a Z-score greater than 3.5 and outputs the row to find some problematic data points.</p>
+<div class="cell" data-execution_count="46">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df2<span class="op">=</span>df.drop([<span class="st">'Year'</span>,<span class="st">'RegionName'</span>],axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>z<span class="op">=</span>stats.zscore(df2)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>outliers<span class="op">=</span>df[(<span class="bu">abs</span>(z)<span class="op">&gt;</span><span class="fl">3.5</span>).<span class="bu">any</span>(axis<span class="op">=</span><span class="dv">1</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-</div>
-<div class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>df[[<span class="st">'DP05_0001E'</span>]])</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Box Plots of Goals For Total Population Changes'</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="DataExploration_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
-</div>
-</div>
-<p>A lot of Outliers in alot of my variables. I should try to remove them.</p>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df2<span class="op">=</span>df.drop([<span class="st">'Year'</span>,<span class="st">'RegionName'</span>],axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df2.corr()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="39">
+<div class="cell" data-execution_count="49">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>outliers</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="49">
 <div>
 
 
@@ -725,32 +999,848 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">DP02_0001E</th>
-<th data-quarto-table-cell-role="th">DP02_0002E</th>
-<th data-quarto-table-cell-role="th">DP02_0003E</th>
-<th data-quarto-table-cell-role="th">DP02_0007E</th>
-<th data-quarto-table-cell-role="th">DP02_0011E</th>
-<th data-quarto-table-cell-role="th">DP02_0037E</th>
-<th data-quarto-table-cell-role="th">DP02_0060E</th>
-<th data-quarto-table-cell-role="th">DP02_0061E</th>
-<th data-quarto-table-cell-role="th">DP02_0062E</th>
-<th data-quarto-table-cell-role="th">DP02_0063E</th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">Total households</th>
+<th data-quarto-table-cell-role="th">Married couple households</th>
+<th data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</th>
+<th data-quarto-table-cell-role="th">Less than 9th grade</th>
+<th data-quarto-table-cell-role="th">9th to 12th grade,no diploma</th>
+<th data-quarto-table-cell-role="th">High school graduate (includes equivalency)</th>
 <th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">DP04_0047E</th>
-<th data-quarto-table-cell-role="th">DP04_0134E</th>
-<th data-quarto-table-cell-role="th">DP05_0001E</th>
-<th data-quarto-table-cell-role="th">DP05_0004E</th>
-<th data-quarto-table-cell-role="th">DP05_0018E</th>
-<th data-quarto-table-cell-role="th">DP05_0037E</th>
-<th data-quarto-table-cell-role="th">DP05_0038E</th>
-<th data-quarto-table-cell-role="th">DP05_0039E</th>
-<th data-quarto-table-cell-role="th">DP05_0044E</th>
+<th data-quarto-table-cell-role="th">Total population</th>
+<th data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</th>
+<th data-quarto-table-cell-role="th">Median Age</th>
+<th data-quarto-table-cell-role="th">Race-White</th>
+<th data-quarto-table-cell-role="th">Race-Black</th>
+<th data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</th>
+<th data-quarto-table-cell-role="th">Race-Asian</th>
+<th data-quarto-table-cell-role="th">Hispanic or Latino</th>
+<th data-quarto-table-cell-role="th">RegionName</th>
 <th data-quarto-table-cell-role="th">Typical Home Value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP02_0001E</td>
+<td data-quarto-table-cell-role="th">10</td>
+<td>2021</td>
+<td>0.055153</td>
+<td>0.056519</td>
+<td>0.063510</td>
+<td>-0.009826</td>
+<td>0.015737</td>
+<td>-0.060886</td>
+<td>-0.074551</td>
+<td>-0.124297</td>
+<td>-0.002245</td>
+<td>...</td>
+<td>-0.000330</td>
+<td>0.005051</td>
+<td>0.007833</td>
+<td>-0.256084</td>
+<td>-0.049722</td>
+<td>-0.113205</td>
+<td>0.014744</td>
+<td>0.017542</td>
+<td>Arizona</td>
+<td>0.465593</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">18</td>
+<td>2021</td>
+<td>0.020610</td>
+<td>0.004144</td>
+<td>-0.013885</td>
+<td>0.047402</td>
+<td>0.002291</td>
+<td>0.016327</td>
+<td>0.014671</td>
+<td>-0.077256</td>
+<td>0.005821</td>
+<td>...</td>
+<td>-0.006944</td>
+<td>0.012146</td>
+<td>0.016216</td>
+<td>-0.342397</td>
+<td>-0.052871</td>
+<td>0.667543</td>
+<td>0.017400</td>
+<td>0.011539</td>
+<td>California</td>
+<td>0.263897</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">34</td>
+<td>2021</td>
+<td>0.083419</td>
+<td>0.083260</td>
+<td>0.110537</td>
+<td>0.092350</td>
+<td>0.068272</td>
+<td>0.025547</td>
+<td>-0.030368</td>
+<td>-0.152002</td>
+<td>-0.007428</td>
+<td>...</td>
+<td>0.014126</td>
+<td>0.012552</td>
+<td>0.009434</td>
+<td>-0.237309</td>
+<td>-0.045173</td>
+<td>0.066859</td>
+<td>0.034113</td>
+<td>0.029537</td>
+<td>Florida</td>
+<td>0.326356</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">42</td>
+<td>2021</td>
+<td>0.053258</td>
+<td>0.069152</td>
+<td>0.116342</td>
+<td>0.055582</td>
+<td>-0.143698</td>
+<td>0.002767</td>
+<td>-0.064805</td>
+<td>-0.035668</td>
+<td>-0.015822</td>
+<td>...</td>
+<td>0.018138</td>
+<td>0.013000</td>
+<td>0.015152</td>
+<td>-0.063111</td>
+<td>0.057980</td>
+<td>-0.210801</td>
+<td>-0.021324</td>
+<td>0.061446</td>
+<td>Hawaii</td>
+<td>0.216170</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">43</td>
+<td>2022</td>
+<td>0.009686</td>
+<td>-0.029597</td>
+<td>-0.055693</td>
+<td>0.103088</td>
+<td>0.310981</td>
+<td>-0.138189</td>
+<td>-0.045804</td>
+<td>0.054461</td>
+<td>0.017893</td>
+<td>...</td>
+<td>-0.000941</td>
+<td>0.001974</td>
+<td>0.014925</td>
+<td>-0.001749</td>
+<td>-0.086856</td>
+<td>-0.152367</td>
+<td>-0.054849</td>
+<td>-0.476645</td>
+<td>Hawaii</td>
+<td>0.119270</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">45</td>
+<td>2019</td>
+<td>0.024348</td>
+<td>-0.183459</td>
+<td>-0.220651</td>
+<td>-0.411395</td>
+<td>-0.851894</td>
+<td>4.711793</td>
+<td>-0.446483</td>
+<td>-0.795935</td>
+<td>0.045187</td>
+<td>...</td>
+<td>0.018730</td>
+<td>-0.001976</td>
+<td>0.002717</td>
+<td>0.012729</td>
+<td>0.052422</td>
+<td>-0.006905</td>
+<td>-0.039110</td>
+<td>0.031601</td>
+<td>Idaho</td>
+<td>0.108631</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">46</td>
+<td>2021</td>
+<td>0.057974</td>
+<td>0.079034</td>
+<td>0.073181</td>
+<td>0.571831</td>
+<td>-0.045821</td>
+<td>-0.150307</td>
+<td>0.138723</td>
+<td>0.079400</td>
+<td>0.108126</td>
+<td>...</td>
+<td>0.063712</td>
+<td>-0.001980</td>
+<td>0.010840</td>
+<td>-0.030580</td>
+<td>0.120161</td>
+<td>0.049110</td>
+<td>0.001232</td>
+<td>0.097702</td>
+<td>Idaho</td>
+<td>0.576048</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50</td>
+<td>2021</td>
+<td>0.025819</td>
+<td>0.021762</td>
+<td>0.029648</td>
+<td>0.059900</td>
+<td>-0.051231</td>
+<td>0.006543</td>
+<td>0.027617</td>
+<td>-0.071533</td>
+<td>-0.026874</td>
+<td>...</td>
+<td>-0.000028</td>
+<td>0.015576</td>
+<td>0.010363</td>
+<td>-0.140766</td>
+<td>-0.037765</td>
+<td>1.598558</td>
+<td>0.014678</td>
+<td>0.027537</td>
+<td>Illinois</td>
+<td>0.168975</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">72</td>
+<td>2018</td>
+<td>0.054252</td>
+<td>0.037673</td>
+<td>0.050175</td>
+<td>-0.070806</td>
+<td>0.065664</td>
+<td>-0.024363</td>
+<td>-0.124215</td>
+<td>0.028409</td>
+<td>0.086337</td>
+<td>...</td>
+<td>0.001869</td>
+<td>0.000000</td>
+<td>0.011211</td>
+<td>-0.000125</td>
+<td>0.157708</td>
+<td>-0.082869</td>
+<td>0.034703</td>
+<td>0.023380</td>
+<td>Maine</td>
+<td>0.064244</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">75</td>
+<td>2022</td>
+<td>0.019730</td>
+<td>0.015848</td>
+<td>-0.026318</td>
+<td>0.199123</td>
+<td>-0.149499</td>
+<td>0.034946</td>
+<td>-0.098515</td>
+<td>0.041105</td>
+<td>0.033876</td>
+<td>...</td>
+<td>0.009541</td>
+<td>0.013485</td>
+<td>0.008949</td>
+<td>0.013462</td>
+<td>0.049219</td>
+<td>0.474843</td>
+<td>-0.032864</td>
+<td>0.716742</td>
+<td>Maine</td>
+<td>0.106837</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">101</td>
+<td>2019</td>
+<td>0.014441</td>
+<td>-0.195616</td>
+<td>-0.357689</td>
+<td>-0.411364</td>
+<td>-0.874712</td>
+<td>2.332518</td>
+<td>-0.618755</td>
+<td>-0.851116</td>
+<td>0.170165</td>
+<td>...</td>
+<td>0.006093</td>
+<td>-0.003945</td>
+<td>0.009975</td>
+<td>-0.001078</td>
+<td>0.540150</td>
+<td>-0.006028</td>
+<td>0.048139</td>
+<td>-0.030693</td>
+<td>Montana</td>
+<td>0.056170</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">103</td>
+<td>2022</td>
+<td>0.033685</td>
+<td>0.019739</td>
+<td>0.064245</td>
+<td>0.001460</td>
+<td>0.205620</td>
+<td>0.375366</td>
+<td>0.583672</td>
+<td>-0.088329</td>
+<td>0.058703</td>
+<td>...</td>
+<td>0.016840</td>
+<td>-0.010659</td>
+<td>0.002494</td>
+<td>0.017740</td>
+<td>-0.357706</td>
+<td>-0.056952</td>
+<td>-0.228635</td>
+<td>0.032370</td>
+<td>Montana</td>
+<td>0.098459</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">110</td>
+<td>2021</td>
+<td>0.041820</td>
+<td>0.031044</td>
+<td>0.055005</td>
+<td>0.048530</td>
+<td>0.030733</td>
+<td>-0.005101</td>
+<td>0.174745</td>
+<td>-0.107987</td>
+<td>0.006687</td>
+<td>...</td>
+<td>0.020725</td>
+<td>0.010934</td>
+<td>0.007813</td>
+<td>-0.215727</td>
+<td>-0.027236</td>
+<td>0.052680</td>
+<td>0.033282</td>
+<td>0.044593</td>
+<td>Nevada</td>
+<td>0.312454</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">122</td>
+<td>2021</td>
+<td>0.051154</td>
+<td>0.079736</td>
+<td>0.070533</td>
+<td>0.149218</td>
+<td>-0.072579</td>
+<td>-0.124290</td>
+<td>-0.103086</td>
+<td>-0.094506</td>
+<td>-0.010343</td>
+<td>...</td>
+<td>0.009084</td>
+<td>0.011247</td>
+<td>0.012953</td>
+<td>-0.383837</td>
+<td>-0.114053</td>
+<td>-0.011588</td>
+<td>-0.049523</td>
+<td>0.025448</td>
+<td>New Mexico</td>
+<td>0.279211</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">126</td>
+<td>2021</td>
+<td>0.027643</td>
+<td>0.014309</td>
+<td>-0.005062</td>
+<td>0.004763</td>
+<td>-0.047201</td>
+<td>-0.018414</td>
+<td>0.034458</td>
+<td>-0.053481</td>
+<td>-0.032565</td>
+<td>...</td>
+<td>0.019655</td>
+<td>0.011640</td>
+<td>0.015306</td>
+<td>-0.103374</td>
+<td>-0.088169</td>
+<td>0.627134</td>
+<td>0.028334</td>
+<td>0.030694</td>
+<td>New York</td>
+<td>0.182680</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">133</td>
+<td>2019</td>
+<td>0.013039</td>
+<td>-0.191167</td>
+<td>-0.231652</td>
+<td>-0.397627</td>
+<td>-0.884407</td>
+<td>3.664530</td>
+<td>-0.382714</td>
+<td>-0.847600</td>
+<td>0.228239</td>
+<td>...</td>
+<td>0.002612</td>
+<td>-0.020735</td>
+<td>0.002825</td>
+<td>0.003411</td>
+<td>-0.140562</td>
+<td>-0.007269</td>
+<td>-0.224016</td>
+<td>0.110844</td>
+<td>North Dakota</td>
+<td>0.036121</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">149</td>
+<td>2019</td>
+<td>0.009528</td>
+<td>-0.266410</td>
+<td>-0.349068</td>
+<td>-0.442714</td>
+<td>-0.835774</td>
+<td>1.914363</td>
+<td>-0.486150</td>
+<td>-0.827213</td>
+<td>1.166320</td>
+<td>...</td>
+<td>-0.000396</td>
+<td>0.001042</td>
+<td>0.000000</td>
+<td>-0.006074</td>
+<td>0.018445</td>
+<td>0.264731</td>
+<td>-0.003000</td>
+<td>0.023664</td>
+<td>Pennsylvania</td>
+<td>0.054333</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">154</td>
+<td>2021</td>
+<td>0.081037</td>
+<td>0.083137</td>
+<td>0.080883</td>
+<td>-0.363321</td>
+<td>0.022460</td>
+<td>0.458082</td>
+<td>-0.023583</td>
+<td>0.110515</td>
+<td>0.010123</td>
+<td>...</td>
+<td>0.034218</td>
+<td>0.006289</td>
+<td>0.012469</td>
+<td>-0.069564</td>
+<td>-0.303738</td>
+<td>-0.013170</td>
+<td>-0.079701</td>
+<td>0.087661</td>
+<td>Rhode Island</td>
+<td>0.261654</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">160</td>
+<td>2018</td>
+<td>0.003454</td>
+<td>0.029545</td>
+<td>0.017244</td>
+<td>-0.000755</td>
+<td>-0.071035</td>
+<td>0.034423</td>
+<td>-0.063419</td>
+<td>0.021516</td>
+<td>-0.081849</td>
+<td>...</td>
+<td>0.014453</td>
+<td>0.001967</td>
+<td>0.008130</td>
+<td>0.005823</td>
+<td>0.121858</td>
+<td>0.026157</td>
+<td>0.394246</td>
+<td>0.086483</td>
+<td>South Dakota</td>
+<td>0.042984</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">170</td>
+<td>2021</td>
+<td>0.081233</td>
+<td>0.078094</td>
+<td>0.081198</td>
+<td>0.062968</td>
+<td>0.020952</td>
+<td>0.111101</td>
+<td>0.016162</td>
+<td>-0.066879</td>
+<td>-0.002312</td>
+<td>...</td>
+<td>0.018350</td>
+<td>0.012183</td>
+<td>0.011396</td>
+<td>-0.335800</td>
+<td>-0.008021</td>
+<td>0.571214</td>
+<td>0.072469</td>
+<td>0.028855</td>
+<td>Texas</td>
+<td>0.269736</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">173</td>
+<td>2019</td>
+<td>0.024992</td>
+<td>-0.167414</td>
+<td>-0.191234</td>
+<td>-0.336425</td>
+<td>-0.789190</td>
+<td>4.233353</td>
+<td>-0.506266</td>
+<td>-0.796194</td>
+<td>-0.043176</td>
+<td>...</td>
+<td>0.014189</td>
+<td>-0.004926</td>
+<td>0.006452</td>
+<td>0.033724</td>
+<td>-0.085396</td>
+<td>0.019897</td>
+<td>0.007536</td>
+<td>0.026285</td>
+<td>Utah</td>
+<td>0.069457</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">177</td>
+<td>2019</td>
+<td>0.005333</td>
+<td>-0.223165</td>
+<td>-0.330161</td>
+<td>-0.269993</td>
+<td>-0.876571</td>
+<td>2.478238</td>
+<td>-0.535917</td>
+<td>-0.832822</td>
+<td>0.639239</td>
+<td>...</td>
+<td>-0.003688</td>
+<td>0.014463</td>
+<td>-0.006961</td>
+<td>-0.007161</td>
+<td>0.238027</td>
+<td>0.679862</td>
+<td>-0.274559</td>
+<td>-0.003373</td>
+<td>Vermont</td>
+<td>0.031649</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">178</td>
+<td>2021</td>
+<td>0.028147</td>
+<td>0.080267</td>
+<td>0.105794</td>
+<td>-0.243446</td>
+<td>-0.071089</td>
+<td>-0.122692</td>
+<td>-0.188336</td>
+<td>-0.179850</td>
+<td>-0.062629</td>
+<td>...</td>
+<td>0.034586</td>
+<td>0.003055</td>
+<td>0.002336</td>
+<td>0.005170</td>
+<td>-0.245363</td>
+<td>-0.578552</td>
+<td>0.318726</td>
+<td>0.064313</td>
+<td>Vermont</td>
+<td>0.263214</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">179</td>
+<td>2022</td>
+<td>0.025640</td>
+<td>0.003709</td>
+<td>-0.015261</td>
+<td>0.395730</td>
+<td>-0.194364</td>
+<td>0.201600</td>
+<td>-0.007340</td>
+<td>-0.097474</td>
+<td>0.005142</td>
+<td>...</td>
+<td>0.002314</td>
+<td>-0.002030</td>
+<td>0.006993</td>
+<td>-0.000163</td>
+<td>-0.112360</td>
+<td>0.050243</td>
+<td>0.032261</td>
+<td>0.631380</td>
+<td>Vermont</td>
+<td>0.091870</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">189</td>
+<td>2019</td>
+<td>-0.008885</td>
+<td>-0.236678</td>
+<td>-0.335715</td>
+<td>-0.388981</td>
+<td>-0.871107</td>
+<td>1.649110</td>
+<td>-0.494669</td>
+<td>-0.781250</td>
+<td>1.090989</td>
+<td>...</td>
+<td>-0.007578</td>
+<td>-0.005092</td>
+<td>0.002336</td>
+<td>-0.007006</td>
+<td>-0.040100</td>
+<td>0.369722</td>
+<td>0.063303</td>
+<td>0.049044</td>
+<td>West Virginia</td>
+<td>0.015365</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">190</td>
+<td>2021</td>
+<td>-0.008204</td>
+<td>-0.019896</td>
+<td>-0.027457</td>
+<td>-0.184190</td>
+<td>0.148089</td>
+<td>-0.145993</td>
+<td>-0.234619</td>
+<td>-0.096763</td>
+<td>-0.039035</td>
+<td>...</td>
+<td>-0.005127</td>
+<td>0.014330</td>
+<td>-0.002331</td>
+<td>-0.030346</td>
+<td>-0.229882</td>
+<td>-0.367676</td>
+<td>-0.014325</td>
+<td>0.131492</td>
+<td>West Virginia</td>
+<td>0.202372</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">191</td>
+<td>2022</td>
+<td>0.019579</td>
+<td>-0.020436</td>
+<td>0.013439</td>
+<td>0.550396</td>
+<td>-0.059651</td>
+<td>0.075458</td>
+<td>0.055790</td>
+<td>-0.065771</td>
+<td>-0.022501</td>
+<td>...</td>
+<td>-0.004376</td>
+<td>-0.003027</td>
+<td>0.002336</td>
+<td>-0.008671</td>
+<td>0.197499</td>
+<td>0.241107</td>
+<td>-0.047427</td>
+<td>0.474959</td>
+<td>West Virginia</td>
+<td>0.079937</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">196</td>
+<td>2018</td>
+<td>0.019735</td>
+<td>-0.008194</td>
+<td>-0.073422</td>
+<td>-0.121206</td>
+<td>0.043319</td>
+<td>0.431683</td>
+<td>-0.029365</td>
+<td>-0.012097</td>
+<td>0.057379</td>
+<td>...</td>
+<td>-0.002724</td>
+<td>-0.016299</td>
+<td>0.026667</td>
+<td>0.000074</td>
+<td>-0.364031</td>
+<td>0.160714</td>
+<td>0.201780</td>
+<td>-0.003906</td>
+<td>Wyoming</td>
+<td>0.023767</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">197</td>
+<td>2019</td>
+<td>0.012491</td>
+<td>-0.145165</td>
+<td>-0.230388</td>
+<td>-0.224044</td>
+<td>-0.888434</td>
+<td>1.387621</td>
+<td>-0.656774</td>
+<td>-0.870279</td>
+<td>0.131951</td>
+<td>...</td>
+<td>0.001769</td>
+<td>0.020468</td>
+<td>-0.010390</td>
+<td>-0.004907</td>
+<td>0.940551</td>
+<td>-0.148965</td>
+<td>-0.202170</td>
+<td>0.012298</td>
+<td>Wyoming</td>
+<td>0.063963</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">201</td>
+<td>2019</td>
+<td>0.014241</td>
+<td>-0.355454</td>
+<td>-0.490505</td>
+<td>-0.365204</td>
+<td>-0.869834</td>
+<td>0.977101</td>
+<td>-0.287304</td>
+<td>-0.701942</td>
+<td>0.298245</td>
+<td>...</td>
+<td>0.004689</td>
+<td>-0.008811</td>
+<td>0.011799</td>
+<td>0.011158</td>
+<td>0.002899</td>
+<td>-0.023810</td>
+<td>0.042995</td>
+<td>0.002877</td>
+<td>District of Columbia</td>
+<td>0.017659</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">202</td>
+<td>2021</td>
+<td>0.096015</td>
+<td>-0.010890</td>
+<td>0.155305</td>
+<td>-0.343210</td>
+<td>0.020759</td>
+<td>-0.059821</td>
+<td>-0.015675</td>
+<td>-0.257760</td>
+<td>-0.112117</td>
+<td>...</td>
+<td>-0.050583</td>
+<td>0.010000</td>
+<td>0.014577</td>
+<td>-0.154024</td>
+<td>-0.097916</td>
+<td>-0.320785</td>
+<td>-0.035861</td>
+<td>-0.032185</td>
+<td>District of Columbia</td>
+<td>0.097177</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">203</td>
+<td>2022</td>
+<td>0.023172</td>
+<td>0.000929</td>
+<td>-0.045818</td>
+<td>-0.211063</td>
+<td>-0.092319</td>
+<td>0.055245</td>
+<td>-0.370224</td>
+<td>0.098800</td>
+<td>-0.089982</td>
+<td>...</td>
+<td>0.002616</td>
+<td>-0.001100</td>
+<td>0.002874</td>
+<td>0.016235</td>
+<td>-0.023242</td>
+<td>1.443404</td>
+<td>0.009714</td>
+<td>-0.084908</td>
+<td>District of Columbia</td>
+<td>-0.009417</td>
+</tr>
+</tbody>
+</table>
+
+<p>32 rows × 34 columns</p>
+</div>
+</div>
+</div>
+<p>Considering how little data I have, this is a lot of rows to drop. I will keep them for now and possibly for the rest of my analysis. If I repeat this with more data I will be sure to drop the outliers.</p>
+</section>
+<section id="correlation" class="level1">
+<h1>Correlation</h1>
+<div class="cell" data-execution_count="51">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df2.corr()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="51">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Total households</th>
+<th data-quarto-table-cell-role="th">Married couple households</th>
+<th data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</th>
+<th data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</th>
+<th data-quarto-table-cell-role="th">Less than 9th grade</th>
+<th data-quarto-table-cell-role="th">9th to 12th grade,no diploma</th>
+<th data-quarto-table-cell-role="th">High school graduate (includes equivalency)</th>
+<th data-quarto-table-cell-role="th">Some college, no degree</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Mean Rent Paid</th>
+<th data-quarto-table-cell-role="th">Total population</th>
+<th data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</th>
+<th data-quarto-table-cell-role="th">Median Age</th>
+<th data-quarto-table-cell-role="th">Race-White</th>
+<th data-quarto-table-cell-role="th">Race-Black</th>
+<th data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</th>
+<th data-quarto-table-cell-role="th">Race-Asian</th>
+<th data-quarto-table-cell-role="th">Hispanic or Latino</th>
+<th data-quarto-table-cell-role="th">Typical Home Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Total households</td>
 <td>1.000000</td>
 <td>0.438800</td>
 <td>0.465624</td>
@@ -762,7 +1852,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.294137</td>
 <td>-0.318927</td>
 <td>...</td>
-<td>0.368283</td>
 <td>0.421822</td>
 <td>0.390172</td>
 <td>0.331799</td>
@@ -771,10 +1860,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.153728</td>
 <td>0.009718</td>
 <td>0.049971</td>
+<td>0.088902</td>
 <td>0.578869</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP02_0002E</td>
+<td data-quarto-table-cell-role="th">Married couple households</td>
 <td>0.438800</td>
 <td>1.000000</td>
 <td>0.981878</td>
@@ -786,7 +1876,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.766019</td>
 <td>-0.920144</td>
 <td>...</td>
-<td>0.063216</td>
 <td>0.497780</td>
 <td>0.276947</td>
 <td>0.331144</td>
@@ -795,10 +1884,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.166218</td>
 <td>0.019215</td>
 <td>0.078385</td>
+<td>0.021463</td>
 <td>0.444488</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP02_0003E</td>
+<td data-quarto-table-cell-role="th">Married couple with children of the householder under 18 years</td>
 <td>0.465624</td>
 <td>0.981878</td>
 <td>1.000000</td>
@@ -810,7 +1900,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.774410</td>
 <td>-0.906359</td>
 <td>...</td>
-<td>0.090782</td>
 <td>0.499087</td>
 <td>0.241894</td>
 <td>0.325107</td>
@@ -819,10 +1908,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.198401</td>
 <td>-0.003718</td>
 <td>0.081323</td>
+<td>0.027813</td>
 <td>0.447811</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP02_0007E</td>
+<td data-quarto-table-cell-role="th">Male householder,no spouse/partner present with children of the householder under 18 years</td>
 <td>0.248086</td>
 <td>0.790430</td>
 <td>0.771685</td>
@@ -834,7 +1924,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.621534</td>
 <td>-0.745090</td>
 <td>...</td>
-<td>0.093202</td>
 <td>0.412152</td>
 <td>0.194073</td>
 <td>0.243893</td>
@@ -843,10 +1932,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.045523</td>
 <td>0.056621</td>
 <td>0.111638</td>
+<td>0.158003</td>
 <td>0.364732</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP02_0011E</td>
+<td data-quarto-table-cell-role="th">Female householder, no spouse/partner present with children of the householder under 18 years</td>
 <td>0.336708</td>
 <td>0.945954</td>
 <td>0.943687</td>
@@ -858,7 +1948,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.749640</td>
 <td>-0.896076</td>
 <td>...</td>
-<td>0.093006</td>
 <td>0.438733</td>
 <td>0.151822</td>
 <td>0.228283</td>
@@ -867,10 +1956,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.214236</td>
 <td>0.019388</td>
 <td>0.115063</td>
+<td>-0.051127</td>
 <td>0.338099</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP02_0037E</td>
+<td data-quarto-table-cell-role="th">Number of women 15 to 50 years old who had a birth in the past 12 months</td>
 <td>-0.260457</td>
 <td>-0.831271</td>
 <td>-0.815491</td>
@@ -882,7 +1972,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.592598</td>
 <td>0.785771</td>
 <td>...</td>
-<td>-0.040640</td>
 <td>-0.411501</td>
 <td>-0.118924</td>
 <td>-0.275845</td>
@@ -891,10 +1980,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.149411</td>
 <td>-0.005464</td>
 <td>-0.171662</td>
+<td>0.015633</td>
 <td>-0.327840</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP02_0060E</td>
+<td data-quarto-table-cell-role="th">Less than 9th grade</td>
 <td>0.312382</td>
 <td>0.757746</td>
 <td>0.781559</td>
@@ -906,7 +1996,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.655789</td>
 <td>-0.724942</td>
 <td>...</td>
-<td>0.135533</td>
 <td>0.460252</td>
 <td>0.192067</td>
 <td>0.237910</td>
@@ -915,10 +2004,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.298075</td>
 <td>0.009762</td>
 <td>0.029356</td>
+<td>-0.046078</td>
 <td>0.297504</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP02_0061E</td>
+<td data-quarto-table-cell-role="th">9th to 12th grade,no diploma</td>
 <td>0.287555</td>
 <td>0.931202</td>
 <td>0.917415</td>
@@ -930,7 +2020,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.752483</td>
 <td>-0.875352</td>
 <td>...</td>
-<td>0.109633</td>
 <td>0.424624</td>
 <td>0.179373</td>
 <td>0.191868</td>
@@ -939,10 +2028,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.195105</td>
 <td>0.055358</td>
 <td>0.137906</td>
+<td>-0.017625</td>
 <td>0.290155</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP02_0062E</td>
+<td data-quarto-table-cell-role="th">High school graduate (includes equivalency)</td>
 <td>-0.294137</td>
 <td>-0.766019</td>
 <td>-0.774410</td>
@@ -954,7 +2044,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>1.000000</td>
 <td>0.625286</td>
 <td>...</td>
-<td>-0.004732</td>
 <td>-0.423344</td>
 <td>-0.185994</td>
 <td>-0.201587</td>
@@ -963,10 +2052,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.132303</td>
 <td>0.004590</td>
 <td>-0.111726</td>
+<td>0.009065</td>
 <td>-0.296042</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP02_0063E</td>
+<td data-quarto-table-cell-role="th">Some college, no degree</td>
 <td>-0.318927</td>
 <td>-0.920144</td>
 <td>-0.906359</td>
@@ -978,7 +2068,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.625286</td>
 <td>1.000000</td>
 <td>...</td>
-<td>-0.068992</td>
 <td>-0.410235</td>
 <td>-0.127849</td>
 <td>-0.290762</td>
@@ -987,10 +2076,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.165423</td>
 <td>-0.042741</td>
 <td>-0.026843</td>
+<td>0.002079</td>
 <td>-0.339538</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP02_0064E</td>
+<td data-quarto-table-cell-role="th">Associates degree</td>
 <td>0.317707</td>
 <td>0.947215</td>
 <td>0.930499</td>
@@ -1002,7 +2092,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.734199</td>
 <td>-0.921569</td>
 <td>...</td>
-<td>0.041452</td>
 <td>0.421006</td>
 <td>0.202411</td>
 <td>0.261304</td>
@@ -1011,10 +2100,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.163936</td>
 <td>0.034185</td>
 <td>0.103434</td>
+<td>0.015772</td>
 <td>0.368901</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP02_0065E</td>
+<td data-quarto-table-cell-role="th">Bachelors degree</td>
 <td>-0.212064</td>
 <td>-0.779303</td>
 <td>-0.778599</td>
@@ -1026,7 +2116,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.584652</td>
 <td>0.712947</td>
 <td>...</td>
-<td>-0.078217</td>
 <td>-0.360112</td>
 <td>-0.060273</td>
 <td>-0.220864</td>
@@ -1035,10 +2124,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.210422</td>
 <td>-0.048662</td>
 <td>-0.174529</td>
+<td>0.027426</td>
 <td>-0.245080</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP03_0026PE</td>
+<td data-quarto-table-cell-role="th">Number of people employed</td>
 <td>-0.164870</td>
 <td>-0.003424</td>
 <td>-0.035541</td>
@@ -1050,7 +2140,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.012144</td>
 <td>0.016294</td>
 <td>...</td>
-<td>0.197981</td>
 <td>0.180419</td>
 <td>0.199823</td>
 <td>-0.381214</td>
@@ -1059,10 +2148,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.082050</td>
 <td>0.009338</td>
 <td>0.120333</td>
+<td>-0.263606</td>
 <td>-0.247353</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP03_0005E</td>
+<td data-quarto-table-cell-role="th">Number of people unemployed</td>
 <td>0.474298</td>
 <td>0.179621</td>
 <td>0.192406</td>
@@ -1074,7 +2164,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.108437</td>
 <td>-0.100239</td>
 <td>...</td>
-<td>-0.192926</td>
 <td>0.128883</td>
 <td>0.342345</td>
 <td>0.444477</td>
@@ -1083,10 +2172,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.175998</td>
 <td>0.068743</td>
 <td>-0.036782</td>
+<td>0.222112</td>
 <td>0.549155</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP03_0062E</td>
+<td data-quarto-table-cell-role="th">Median Household Income</td>
 <td>-0.024458</td>
 <td>-0.004581</td>
 <td>-0.021028</td>
@@ -1098,7 +2188,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.021158</td>
 <td>0.063929</td>
 <td>...</td>
-<td>-0.274300</td>
 <td>0.437673</td>
 <td>0.252681</td>
 <td>0.059726</td>
@@ -1107,10 +2196,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.076748</td>
 <td>-0.040125</td>
 <td>0.118803</td>
+<td>-0.214884</td>
 <td>0.242465</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP03_0063E</td>
+<td data-quarto-table-cell-role="th">Mean Household Income</td>
 <td>0.129516</td>
 <td>0.169651</td>
 <td>0.165921</td>
@@ -1122,7 +2212,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.101892</td>
 <td>-0.098668</td>
 <td>...</td>
-<td>-0.134462</td>
 <td>0.542114</td>
 <td>0.318451</td>
 <td>0.082443</td>
@@ -1131,10 +2220,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.164692</td>
 <td>-0.135585</td>
 <td>0.213101</td>
+<td>-0.159560</td>
 <td>0.450604</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP03_0093E</td>
+<td data-quarto-table-cell-role="th">Median earnings for male full-time, year-round workers</td>
 <td>0.521425</td>
 <td>0.358641</td>
 <td>0.380646</td>
@@ -1146,7 +2236,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.291935</td>
 <td>-0.254937</td>
 <td>...</td>
-<td>-0.165930</td>
 <td>0.402790</td>
 <td>0.242736</td>
 <td>0.490989</td>
@@ -1155,10 +2244,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.167742</td>
 <td>-0.061886</td>
 <td>0.058246</td>
+<td>0.141308</td>
 <td>0.613716</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP03_0094E</td>
+<td data-quarto-table-cell-role="th">Median earnings for female full-time, year-round workers</td>
 <td>0.527228</td>
 <td>0.396203</td>
 <td>0.417353</td>
@@ -1170,7 +2260,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.255274</td>
 <td>-0.341490</td>
 <td>...</td>
-<td>-0.106647</td>
 <td>0.449579</td>
 <td>0.233298</td>
 <td>0.499738</td>
@@ -1179,10 +2268,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.333074</td>
 <td>-0.037168</td>
 <td>-0.015659</td>
+<td>0.071689</td>
 <td>0.681039</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP04_0002E</td>
+<td data-quarto-table-cell-role="th">Occupied Housing Units</td>
 <td>1.000000</td>
 <td>0.438800</td>
 <td>0.465624</td>
@@ -1194,7 +2284,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.294137</td>
 <td>-0.318927</td>
 <td>...</td>
-<td>0.368283</td>
 <td>0.421822</td>
 <td>0.390172</td>
 <td>0.331799</td>
@@ -1203,10 +2292,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.153728</td>
 <td>0.009718</td>
 <td>0.049971</td>
+<td>0.088902</td>
 <td>0.578869</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP04_0001E</td>
+<td data-quarto-table-cell-role="th">Total Housing Units</td>
 <td>0.686693</td>
 <td>0.172911</td>
 <td>0.203209</td>
@@ -1218,7 +2308,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.148170</td>
 <td>-0.090230</td>
 <td>...</td>
-<td>0.372963</td>
 <td>0.229018</td>
 <td>0.221057</td>
 <td>0.102697</td>
@@ -1227,10 +2316,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.003257</td>
 <td>0.108058</td>
 <td>0.029278</td>
+<td>-0.099109</td>
 <td>0.208816</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP04_0037E</td>
+<td data-quarto-table-cell-role="th">Median Rooms</td>
 <td>0.196957</td>
 <td>0.217412</td>
 <td>0.214178</td>
@@ -1242,7 +2332,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.129029</td>
 <td>-0.188487</td>
 <td>...</td>
-<td>-0.247484</td>
 <td>0.135262</td>
 <td>0.309887</td>
 <td>0.268522</td>
@@ -1251,10 +2340,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.235029</td>
 <td>-0.039576</td>
 <td>0.070796</td>
+<td>0.210841</td>
 <td>0.502435</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP04_0047E</td>
+<td data-quarto-table-cell-role="th">Renter Occupied Housing Units</td>
 <td>0.368283</td>
 <td>0.063216</td>
 <td>0.090782</td>
@@ -1266,7 +2356,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.004732</td>
 <td>-0.068992</td>
 <td>...</td>
-<td>1.000000</td>
 <td>0.088938</td>
 <td>-0.028178</td>
 <td>-0.058786</td>
@@ -1275,10 +2364,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.027316</td>
 <td>0.028427</td>
 <td>0.026458</td>
+<td>-0.041721</td>
 <td>-0.124036</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP04_0134E</td>
+<td data-quarto-table-cell-role="th">Mean Rent Paid</td>
 <td>0.421822</td>
 <td>0.497780</td>
 <td>0.499087</td>
@@ -1290,7 +2380,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.423344</td>
 <td>-0.410235</td>
 <td>...</td>
-<td>0.088938</td>
 <td>1.000000</td>
 <td>0.420228</td>
 <td>0.334809</td>
@@ -1299,10 +2388,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.180041</td>
 <td>-0.021600</td>
 <td>0.112019</td>
+<td>-0.076343</td>
 <td>0.570452</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP05_0001E</td>
+<td data-quarto-table-cell-role="th">Total population</td>
 <td>0.390172</td>
 <td>0.276947</td>
 <td>0.241894</td>
@@ -1314,7 +2404,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.185994</td>
 <td>-0.127849</td>
 <td>...</td>
-<td>-0.028178</td>
 <td>0.420228</td>
 <td>1.000000</td>
 <td>0.216560</td>
@@ -1323,10 +2412,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.080334</td>
 <td>0.018665</td>
 <td>0.225440</td>
+<td>0.131966</td>
 <td>0.544573</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP05_0004E</td>
+<td data-quarto-table-cell-role="th">Sex ratio (males per 100 females)</td>
 <td>0.331799</td>
 <td>0.331144</td>
 <td>0.325107</td>
@@ -1338,7 +2428,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.201587</td>
 <td>-0.290762</td>
 <td>...</td>
-<td>-0.058786</td>
 <td>0.334809</td>
 <td>0.216560</td>
 <td>1.000000</td>
@@ -1347,10 +2436,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.006381</td>
 <td>-0.009656</td>
 <td>-0.131272</td>
+<td>0.118501</td>
 <td>0.539996</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP05_0018E</td>
+<td data-quarto-table-cell-role="th">Median Age</td>
 <td>0.277745</td>
 <td>0.021856</td>
 <td>0.017160</td>
@@ -1362,7 +2452,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.058643</td>
 <td>-0.002780</td>
 <td>...</td>
-<td>0.149449</td>
 <td>-0.060136</td>
 <td>-0.059961</td>
 <td>-0.016104</td>
@@ -1371,10 +2460,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.119643</td>
 <td>0.039093</td>
 <td>0.032161</td>
+<td>-0.041476</td>
 <td>0.028251</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP05_0037E</td>
+<td data-quarto-table-cell-role="th">Race-White</td>
 <td>-0.536511</td>
 <td>-0.274077</td>
 <td>-0.278718</td>
@@ -1386,7 +2476,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.172882</td>
 <td>0.222860</td>
 <td>...</td>
-<td>0.031237</td>
 <td>-0.268605</td>
 <td>-0.053172</td>
 <td>-0.420289</td>
@@ -1395,10 +2484,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.168399</td>
 <td>-0.169048</td>
 <td>0.027705</td>
+<td>-0.093049</td>
 <td>-0.589996</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP05_0038E</td>
+<td data-quarto-table-cell-role="th">Race-Black</td>
 <td>-0.153728</td>
 <td>-0.166218</td>
 <td>-0.198401</td>
@@ -1410,7 +2500,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.132303</td>
 <td>0.165423</td>
 <td>...</td>
-<td>0.027316</td>
 <td>-0.180041</td>
 <td>-0.080334</td>
 <td>-0.006381</td>
@@ -1419,10 +2508,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>1.000000</td>
 <td>0.039821</td>
 <td>-0.071010</td>
+<td>-0.043821</td>
 <td>-0.254423</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">DP05_0039E</td>
+<td data-quarto-table-cell-role="th">Race-American Indian and Alaska Native</td>
 <td>0.009718</td>
 <td>0.019215</td>
 <td>-0.003718</td>
@@ -1434,7 +2524,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.004590</td>
 <td>-0.042741</td>
 <td>...</td>
-<td>0.028427</td>
 <td>-0.021600</td>
 <td>0.018665</td>
 <td>-0.009656</td>
@@ -1443,10 +2532,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.039821</td>
 <td>1.000000</td>
 <td>-0.060736</td>
+<td>0.038923</td>
 <td>-0.066153</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">DP05_0044E</td>
+<td data-quarto-table-cell-role="th">Race-Asian</td>
 <td>0.049971</td>
 <td>0.078385</td>
 <td>0.081323</td>
@@ -1458,7 +2548,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.111726</td>
 <td>-0.026843</td>
 <td>...</td>
-<td>0.026458</td>
 <td>0.112019</td>
 <td>0.225440</td>
 <td>-0.131272</td>
@@ -1467,9 +2556,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.071010</td>
 <td>-0.060736</td>
 <td>1.000000</td>
+<td>0.025958</td>
 <td>0.079361</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">Hispanic or Latino</td>
+<td>0.088902</td>
+<td>0.021463</td>
+<td>0.027813</td>
+<td>0.158003</td>
+<td>-0.051127</td>
+<td>0.015633</td>
+<td>-0.046078</td>
+<td>-0.017625</td>
+<td>0.009065</td>
+<td>0.002079</td>
+<td>...</td>
+<td>-0.076343</td>
+<td>0.131966</td>
+<td>0.118501</td>
+<td>-0.041476</td>
+<td>-0.093049</td>
+<td>-0.043821</td>
+<td>0.038923</td>
+<td>0.025958</td>
+<td>1.000000</td>
+<td>0.198465</td>
+</tr>
+<tr class="even">
 <td data-quarto-table-cell-role="th">Typical Home Value</td>
 <td>0.578869</td>
 <td>0.444488</td>
@@ -1482,7 +2596,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.296042</td>
 <td>-0.339538</td>
 <td>...</td>
-<td>-0.124036</td>
 <td>0.570452</td>
 <td>0.544573</td>
 <td>0.539996</td>
@@ -1491,27 +2604,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>-0.254423</td>
 <td>-0.066153</td>
 <td>0.079361</td>
+<td>0.198465</td>
 <td>1.000000</td>
 </tr>
 </tbody>
 </table>
 
-<p>31 rows × 31 columns</p>
+<p>32 rows × 32 columns</p>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>)) </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(df2.corr(), annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'coolwarm'</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Correlation Heatmap"</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="52">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>)) </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(df2.corr(), annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'coolwarm'</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Correlation Heatmap"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display">
-<p><img src="DataExploration_files/figure-html/cell-17-output-1.png" class="img-fluid"></p>
+<p><img src="DataExploration_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>It seems my initial hypotheses were correct in that most of the questions I was asking are relevant to home prices.</p>
+<p>Many Variables are highly correlated. More on this in the dimensionality reduction section.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

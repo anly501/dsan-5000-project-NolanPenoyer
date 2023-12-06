@@ -155,10 +155,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Decision Trees</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./ARM.html" rel="" target="">
- <span class="menu-text">ARM</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./Conclusions.html" rel="" target="">
  <span class="menu-text">Conclusions</span></a>
   </li>  
@@ -178,10 +174,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#python-api" id="toc-python-api" class="nav-link active" data-scroll-target="#python-api">Python API</a></li>
-  <li><a href="#r-api" id="toc-r-api" class="nav-link" data-scroll-target="#r-api">R API</a></li>
-  <li><a href="#news-api" id="toc-news-api" class="nav-link" data-scroll-target="#news-api">News API</a></li>
-  <li><a href="#download" id="toc-download" class="nav-link" data-scroll-target="#download">Download</a></li>
+  <li><a href="#census-data" id="toc-census-data" class="nav-link active" data-scroll-target="#census-data">Census Data</a></li>
+  <li><a href="#home-value-data" id="toc-home-value-data" class="nav-link" data-scroll-target="#home-value-data">Home Value Data</a></li>
+  <li><a href="#news-data" id="toc-news-data" class="nav-link" data-scroll-target="#news-data">News Data</a></li>
+  <li><a href="#reddit-data" id="toc-reddit-data" class="nav-link" data-scroll-target="#reddit-data">Reddit Data</a></li>
   </ul>
 </nav>
     </div>
@@ -205,26 +201,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>I will attempt to gather all the data I need to answer my 10 questions. Most of the data I acquire will come from census.gov. I will use data tables from the U.S. Census Bureau’s American Community Survey (ACS), a nationwide survey that collects and produces information on social, economic, housing, and demographic characteristics about our nation’s population each year.</p>
-<p>I do not know how exactly I will be doing my analysis yet or what variables I think will be most useful, but to cover all my bases I will import the DP02-DP05 tables from 2017-2022, excluding 2020 because there was not accurate data that year due to COVID. I may not need all these tables or columns in the tables but it will be nice to have easy access to them in my future analysis.</p>
+<section id="census-data" class="level1">
+<h1>Census Data</h1>
+<p>I will attempt to gather all the data I need to answer my 10 questions. Most of the data I acquire will come from <a href="https://www.census.gov/">census.gov</a>. I will use data tables from the U.S. Census Bureau’s <a href="https://www.census.gov/data/developers/data-sets/ACS-supplemental-data.html">American Community Survey</a> (ACS), a nationwide survey that collects and produces information on social, economic, housing, and demographic characteristics about our nation’s population each year.</p>
+<p>I chose census data and specifically the ACS tables because, from experience and knowledge I have accumulated in my life, I inferred that the variables in these tables could be useful in predicting home prices. For example, one variable I will examine is the number of people with bachelor’s degrees. Usually, higher education is linked to higher incomes, and therefore, higher home prices. The variables I choose to include from the tables may prove valuable or they may not; part of my analysis is determining which variables are the most important. Also, a lot of my variables are heavily correlated with each other, like total households and total married households. This can become an issue in the models I create as multicollinearity increases variance and makes it hard to know the impact of an individual variable in the model. I am aware of this and will address it later in my project.</p>
+<p>I will import the DP02-DP05 tables from 2017-2022, excluding 2020 because there was not accurate data that year due to COVID. Ultimately, I will not need all the columns in the tables, but it will be nice to have easy access to them in my future analysis. I only went back to 2017 for now, but if I wanted to improve my models, I could retrieve more data. The same methodology will apply no matter how much data I acquire.</p>
 <p>Here are what the ACS tables contain:<br> DP02: Selected Social Characteristics in the United States <br> DP03: Selected Economic Characteristics in the United States <br> DP04: Selected Housing Characteristics <br> DP05: ACS Demographic and Housing Estimates</p>
-<p>Here is a link to the webpage: https://www.census.gov/data/developers/data-sets/ACS-supplemental-data.html</p>
-<p>I decided that I just want to focus on the real estate growth potential in every state. I can start broad by going by state, then in the future I can apply this study to different geographical levels, like if I wanted to focus on one state and compare different counties or cities. The methodology will be the same. So, a state in the United States will be my observational unit.</p>
-<section id="python-api" class="level1">
-<h1>Python API</h1>
-<p>I will start by using an API in python to get one table to see what we are working with.</p>
-<div class="cell" data-execution_count="42">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>DP02_URL_2017<span class="op">=</span><span class="st">"https://api.census.gov/data/2017/acs/acs1/profile?get=group(DP02)&amp;for=state:*"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>DP02_2017<span class="op">=</span> requests.get(DP02_URL_2017)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>DP02_2017 <span class="op">=</span> DP02_2017.json()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>DP02_2017<span class="op">=</span>pd.DataFrame(DP02_2017)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>DP02_2017.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Using the API, you can query different geography hierarchies, like if you want data on regions in the U.S. or, in my analysis, on U.S. states.</p>
+<p>I will start by retreiving one table to see what we are working with.</p>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="42">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>import json</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>import re</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>DP02_URL_2017<span class="ot">=</span><span class="st">"https://api.census.gov/data/2017/acs/acs1/profile?get=group(DP02)&amp;for=state:*"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>DP02_2017<span class="ot">=</span> <span class="fu">requests.get</span>(DP02_URL_2017)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>DP02_2017 <span class="ot">=</span> <span class="fu">DP02_2017.json</span>()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>DP02_2017<span class="ot">=</span><span class="fu">pd.DataFrame</span>(DP02_2017)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">DP02_2017.head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-display" data-execution_count="42">
 <div>
 
@@ -384,642 +381,221 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>As you can see the column names do not tell us much right now because they are codes that match to different variable labels in the census data. For example, DP02_0001E maps to total household counts. In the data cleaning section, we will be sure to give each column a proper label that tells us what the column represents. Furthermore, we will only keep a select few columns out of the large number of variables in the data cleaning section.</p>
-<p>I will use the following code to get each table I want and turn them into csvs for easy retrieval for the rest of my analysis.</p>
-<div class="cell" data-execution_count="81">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>string<span class="op">=</span><span class="st">'https://api.census.gov/data/2016/acs/acs1/profile?get=group(DP05)&amp;for=state'</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>list1<span class="op">=</span>[<span class="st">'2016'</span>,<span class="st">'2017'</span>,<span class="st">'2018'</span>,<span class="st">'2019'</span>,<span class="st">'2021'</span>]</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>list2<span class="op">=</span>[<span class="st">'2017'</span>,<span class="st">'2018'</span>,<span class="st">'2019'</span>,<span class="st">'2021'</span>,<span class="st">'2022'</span>]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>list3<span class="op">=</span>[<span class="st">'DP01'</span>,<span class="st">'DP02'</span>,<span class="st">'DP03'</span>,<span class="st">'DP04'</span>]</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>list4<span class="op">=</span>[<span class="st">'DP02'</span>,<span class="st">'DP03'</span>,<span class="st">'DP04'</span>,<span class="st">'DP05'</span>]</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    string<span class="op">=</span>string.replace(<span class="st">'DP05'</span>,list3[<span class="dv">0</span>])</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">file</span><span class="op">=</span><span class="st">'./data/'</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        csv<span class="op">=</span><span class="st">'.csv'</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        name<span class="op">=</span><span class="bu">file</span><span class="op">+</span>list2[i]<span class="op">+</span>list4[w]<span class="op">+</span>csv</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        csvname<span class="op">=</span><span class="bu">file</span><span class="op">+</span>list2[i]<span class="op">+</span>list3[w]</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        string<span class="op">=</span>string.replace(list1[i],list2[i])</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        string<span class="op">=</span>string.replace(list3[w],list4[w])</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        response<span class="op">=</span>requests.get(string)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        response <span class="op">=</span> response.json()</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        df<span class="op">=</span>pd.DataFrame(response)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        df.to_csv(name, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The column names do not tell us much right now because they are codes that match to different variable labels in the census data. For example, DP02_0001E maps to total household counts. In the data cleaning section, we will be sure to give each column a proper label that tells us what the column represents. Also in the data cleaning section, we will only keep a select few columns out of the over 1000 columns in the tables.</p>
+<p>I will use the following loop to get each table I want and turn them into csv files for easy retrieval for the rest of my analysis. If you would like to see my csv files, please refer to this <a href="https://github.com/anly501/dsan-5000-project-NolanPenoyer/tree/main/Nolan%20Penoyer%20Website">GitHub Repository</a>.<br> <em>Nolan Penoyer Website/data</em> (Every file that starts with a year)</p>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="81">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>string<span class="ot">=</span><span class="st">'https://api.census.gov/data/2016/acs/acs1/profile?get=group(DP05)&amp;for=state'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>list1<span class="ot">=</span>[<span class="st">'2016'</span>,<span class="st">'2017'</span>,<span class="st">'2018'</span>,<span class="st">'2019'</span>,<span class="st">'2021'</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>list2<span class="ot">=</span>[<span class="st">'2017'</span>,<span class="st">'2018'</span>,<span class="st">'2019'</span>,<span class="st">'2021'</span>,<span class="st">'2022'</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>list3<span class="ot">=</span>[<span class="st">'DP01'</span>,<span class="st">'DP02'</span>,<span class="st">'DP03'</span>,<span class="st">'DP04'</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>list4<span class="ot">=</span>[<span class="st">'DP02'</span>,<span class="st">'DP03'</span>,<span class="st">'DP04'</span>,<span class="st">'DP05'</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="cf">in</span> <span class="fu">range</span>(<span class="dv">5</span>)<span class="sc">:</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    string<span class="ot">=</span><span class="fu">string.replace</span>(<span class="st">'DP05'</span>,list3[<span class="dv">0</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w <span class="cf">in</span> <span class="fu">range</span>(<span class="dv">4</span>)<span class="sc">:</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        file<span class="ot">=</span><span class="st">'./data/'</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        csv<span class="ot">=</span><span class="st">'.csv'</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        name<span class="ot">=</span>file<span class="sc">+</span>list2[i]<span class="sc">+</span>list4[w]<span class="sc">+</span>csv</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        csvname<span class="ot">=</span>file<span class="sc">+</span>list2[i]<span class="sc">+</span>list3[w]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        string<span class="ot">=</span><span class="fu">string.replace</span>(list1[i],list2[i])</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        string<span class="ot">=</span><span class="fu">string.replace</span>(list3[w],list4[w])</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        response<span class="ot">=</span><span class="fu">requests.get</span>(string)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        response <span class="ot">=</span> <span class="fu">response.json</span>()</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        df<span class="ot">=</span><span class="fu">pd.DataFrame</span>(response)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">df.to_csv</span>(name, <span class="at">index=</span>False)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
-<section id="r-api" class="level1">
-<h1>R API</h1>
+<section id="home-value-data" class="level1">
+<h1>Home Value Data</h1>
+<p>My home value data comes from <a href="https://www.zillow.com/research/data/">Zillow</a>. Specifically, I will use Zillow’s Home Value Index (ZHVI), which reflects the typical value of homes in the 35th to 65th percentile, a home that will be in my price range. The ZHVI was created to accurately capture the seasonally adjusted value of a typical property across the nation as opposed to just the homes that sold. If you would like to learn more about how Zillow calculates this value and why it is a more accurate measure of home value as opposed to other alternatives like median home price, you can visit the link I provided.</p>
+<p>Zillow has an API, but since it was one table I needed, I downloaded the csv file. Like my census data, I calculated this data on the state level for years 2017-2022, excluding 2020. If you would like to see my csv file, please refer to this <a href="https://github.com/anly501/dsan-5000-project-NolanPenoyer/tree/main/Nolan%20Penoyer%20Website">GitHub Repository</a>.<br> <em>Nolan Penoyer Website/data</em> (Zillow.csv))</p>
+</section>
+<section id="news-data" class="level1">
+<h1>News Data</h1>
+<p>Although not a focus of my project, news headline text data could potentially provide us with some insight on the sentiment of the real estate market and therefore what direction the general population thinks home prices are heading. The overall sentiment can provide us with signals that people are overvaluing or undervaluing homes, or that a rise or drop in home prices may be pending. Knowing if the general public believes buying a home, especially in a certain state, is a smart decision, can tell us which direction prices are headed, depending if you agree with the general public or not. Another potential data science project I would like to study in the future is if market sentiment matches market performance, and if there is a lag between the two.</p>
+<p>I will use the <a href="https://newsapi.org/">news API</a> to search and retreive live articles from across the web. I will only search for articles that contain “Real Estate” in the headline. If you would like to see my csv file, please refer to this <a href="https://github.com/anly501/dsan-5000-project-NolanPenoyer/tree/main/Nolan%20Penoyer%20Website">GitHub Repository</a>.<br> <em>Nolan Penoyer Website/data</em> (news.csv))</p>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="10">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>import requests</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>import json</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>import re</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>from sklearn.feature_extraction.text import CountVectorizer</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>baseURL <span class="ot">=</span> <span class="st">"https://newsapi.org/v2/everything?"</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>total_requests<span class="ot">=</span><span class="dv">2</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>verbose<span class="ot">=</span>True</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>API_KEY<span class="ot">=</span><span class="st">'6a2b4aca491e4bedb90a4c7275f2ddf6'</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>TOPIC<span class="ot">=</span><span class="st">'Real Estate'</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>URLpost <span class="ot">=</span> {<span class="st">'apiKey'</span><span class="sc">:</span> API_KEY,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">'q'</span><span class="sc">:</span> <span class="st">'+'</span><span class="sc">+</span>TOPIC,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">'sortBy'</span><span class="sc">:</span> <span class="st">'relevancy'</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">'totalRequests'</span><span class="sc">:</span> <span class="dv">1</span>}</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#print(baseURL)</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>response <span class="ot">=</span> <span class="fu">requests.get</span>(baseURL, URLpost)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>response <span class="ot">=</span> <span class="fu">response.json</span>()</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>def <span class="fu">string_cleaner</span>(input_string)<span class="sc">:</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    try<span class="sc">:</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        out<span class="ot">=</span><span class="fu">re.sub</span>(r<span class="st">"""</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="st">                    [,.;@#?!&amp;$-]+  # Accept one or more copies of punctuation</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="st">                    \ *           # plus zero or more copies of a space,</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="st">                    """</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                    <span class="st">" "</span>,          <span class="co"># and replace it with a single space</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                    input_string, <span class="at">flags=</span>re.VERBOSE)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="co">#REPLACE SELECT CHARACTERS WITH NOTHING</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        out <span class="ot">=</span> <span class="fu">re.sub</span>(<span class="st">'[’.]+'</span>, <span class="st">''</span>, input_string)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">#ELIMINATE DUPLICATE WHITESPACES USING WILDCARDS</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        out <span class="ot">=</span> <span class="fu">re.sub</span>(r<span class="st">'\s+'</span>, <span class="st">' '</span>, out)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        <span class="co">#CONVERT TO LOWER CASE</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        out<span class="ot">=</span><span class="fu">out.lower</span>()</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    except<span class="sc">:</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print("ERROR")</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        out<span class="ot">=</span><span class="st">''</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    return out</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>article_list<span class="ot">=</span>response[<span class="st">'articles'</span>]   <span class="co">#list of dictionaries for each article</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>article_keys<span class="ot">=</span>article_list[<span class="dv">0</span>]<span class="fu">.keys</span>()</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co">#print("AVAILABLE KEYS:")</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co">#print(article_keys)</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>index<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>cleaned_data<span class="ot">=</span>[];  </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> article <span class="cf">in</span> article_list<span class="sc">:</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    tmp<span class="ot">=</span>[]</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> key <span class="cf">in</span> article_keys<span class="sc">:</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="sc">==</span><span class="st">'source'</span>)<span class="sc">:</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>            src<span class="ot">=</span><span class="fu">string_cleaner</span>(article[key][<span class="st">'name'</span>])</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tmp.append</span>(src) </span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="sc">==</span><span class="st">'author'</span>)<span class="sc">:</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>            author<span class="ot">=</span><span class="fu">string_cleaner</span>(article[key])</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>            <span class="co">#ERROR CHECK (SOMETIMES AUTHOR IS SAME AS PUBLICATION)</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(src <span class="cf">in</span> author)<span class="sc">:</span> </span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>                <span class="fu">tmp.append</span>(author)</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="sc">==</span><span class="st">'title'</span>)<span class="sc">:</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tmp.append</span>(<span class="fu">string_cleaner</span>(article[key]))</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>        <span class="co"># if(key=='description'):</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>        <span class="co">#     tmp.append(string_cleaner(article[key]))</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>        <span class="co"># if(key=='content'):</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>        <span class="co">#     tmp.append(string_cleaner(article[key]))</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="sc">==</span><span class="st">'publishedAt'</span>)<span class="sc">:</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>            <span class="co">#DEFINE DATA PATERN FOR RE TO CHECK  .* --&gt; wildcard</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>            ref <span class="ot">=</span> <span class="fu">re.compile</span>(<span class="st">'.*-.*-.*T.*:.*:.*Z'</span>)</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>            date<span class="ot">=</span>article[key]</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(not <span class="fu">ref.match</span>(date))<span class="sc">:</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>                <span class="fu">print</span>(<span class="st">" DATE ERROR:"</span>,date); date<span class="ot">=</span><span class="st">"NA"</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tmp.append</span>(date)</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cleaned_data.append</span>(tmp)</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    index<span class="sc">+</span><span class="er">=</span><span class="dv">1</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">pd.DataFrame</span>(cleaned_data)</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="fu">df.head</span>()</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="fu">df.to_csv</span>(<span class="st">'./data/news.csv'</span>, <span class="at">index=</span>False) <span class="co">#,index_label=['title','src','author','date','description'])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="6">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">df.head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">0</th>
+<th data-quarto-table-cell-role="th">1</th>
+<th data-quarto-table-cell-role="th">2</th>
+<th data-quarto-table-cell-role="th">3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>lifehackercom</td>
+<td>elizabeth yuko</td>
+<td>what to do if your home inspector missed a maj...</td>
+<td>2023-11-12T18:00:00Z</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>slashdotorg</td>
+<td>msmash</td>
+<td>almost no one pays a 6% real-estate commission...</td>
+<td>2023-11-17T18:40:00Z</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>business insider</td>
+<td>george glover</td>
+<td>real estate made china rich now it's looking m...</td>
+<td>2023-11-16T10:11:14Z</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>business insider</td>
+<td>cork gaines</td>
+<td>baby boomers got rich off real estate and they...</td>
+<td>2023-11-19T10:32:01Z</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>business insider</td>
+<td>theron mohamed</td>
+<td>stocks may crash 30%, a recession looks immine...</td>
+<td>2023-11-19T11:30:01Z</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 <p>Here I will use an API in R to retreive text data that can give me some insight into some real estate trends and what states people are talking about.</p>
-<div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>library(RedditExtractoR)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>library(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>states <span class="op">&lt;-</span> c(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Alabama"</span>, <span class="st">"Alaska"</span>, <span class="st">"Arizona"</span>, <span class="st">"Arkansas"</span>, <span class="st">"California"</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Colorado"</span>, <span class="st">"Connecticut"</span>, <span class="st">"Delaware"</span>, <span class="st">"Florida"</span>, <span class="st">"Georgia"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hawaii"</span>, <span class="st">"Idaho"</span>, <span class="st">"Illinois"</span>, <span class="st">"Indiana"</span>, <span class="st">"Iowa"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Kansas"</span>, <span class="st">"Kentucky"</span>, <span class="st">"Louisiana"</span>, <span class="st">"Maine"</span>, <span class="st">"Maryland"</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Massachusetts"</span>, <span class="st">"Michigan"</span>, <span class="st">"Minnesota"</span>, <span class="st">"Mississippi"</span>, <span class="st">"Missouri"</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Montana"</span>, <span class="st">"Nebraska"</span>, <span class="st">"Nevada"</span>, <span class="st">"New Hampshire"</span>, <span class="st">"New Jersey"</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"New Mexico"</span>, <span class="st">"New York"</span>, <span class="st">"North Carolina"</span>, <span class="st">"North Dakota"</span>, <span class="st">"Ohio"</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Oklahoma"</span>, <span class="st">"Oregon"</span>, <span class="st">"Pennsylvania"</span>, <span class="st">"Rhode Island"</span>, <span class="st">"South Carolina"</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"South Dakota"</span>, <span class="st">"Tennessee"</span>, <span class="st">"Texas"</span>, <span class="st">"Utah"</span>, <span class="st">"Vermont"</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Virginia"</span>, <span class="st">"Washington"</span>, <span class="st">"West Virginia"</span>, <span class="st">"Wisconsin"</span>, <span class="st">"Wyoming"</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>text<span class="op">&lt;-</span>data.frame()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>subreddit<span class="op">=</span><span class="st">"RealEstate"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Attemped to run this loop but it seems Reddit would not let me execute this.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (state <span class="kw">in</span> states){</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    state_df<span class="op">&lt;-</span> find_thread_urls(keywords <span class="op">=</span> state,subreddit<span class="op">=</span>subreddit, sort_by<span class="op">=</span><span class="st">"top"</span>, period <span class="op">=</span> <span class="st">'year'</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    state_df<span class="op">&lt;-</span>state_df<span class="op">|&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    mutate(State<span class="op">=</span>state)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    text<span class="op">&lt;-</span>rbind(text,state_df)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Start with just general real estate and attempt to run states another time.</p>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>RealEstate <span class="op">&lt;-</span> find_thread_urls(keywords <span class="op">=</span> <span class="st">"Buy"</span>,subreddit<span class="op">=</span>subreddit, sort_by<span class="op">=</span><span class="st">"top"</span>, period <span class="op">=</span> <span class="st">'year'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>parsing URLs on page 1...</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning message in file(con, "r"):
-"cannot open URL 'https://www.reddit.com/r/RealEstate/search.json?restrict_sr=on&amp;q=Buy&amp;sort=top&amp;t=year&amp;limit=100': HTTP status was '429 Unknown Error'"</code></pre>
-</div>
-<div class="cell-output cell-output-error">
-<pre><code>ERROR: Error in h(simpleError(msg, call)): error in evaluating the argument 'content' in selecting a method for function 'fromJSON': cannot open the connection to 'https://www.reddit.com/r/RealEstate/search.json?restrict_sr=on&amp;q=Buy&amp;sort=top&amp;t=year&amp;limit=100'</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>find_thread_urls(keywords <span class="op">=</span> <span class="st">"Buy"</span> ,subreddit<span class="op">=</span>subreddit, sort_by<span class="op">=</span><span class="st">"top"</span>, period <span class="op">=</span> <span class="st">'year'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
-<section id="news-api" class="level1">
-<h1>News API</h1>
-<div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> CountVectorizer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="reddit-data" class="level1">
+<h1>Reddit Data</h1>
+<p>I can also retrieve Reddit text data for the same reason. Reddit comments are a more accurate measure of what the public believes than news data as there are no biases and incentives from corporations to report news a certain way. I also can break up the text data by state, which I attempted to do below. I need to find a work around as Reddit limits how many requests you are allowed in a period of time. I will not use Reddit data for the rest of this project.</p>
+<div class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="13">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RedditExtractoR)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>states <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Alabama"</span>, <span class="st">"Alaska"</span>, <span class="st">"Arizona"</span>, <span class="st">"Arkansas"</span>, <span class="st">"California"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Colorado"</span>, <span class="st">"Connecticut"</span>, <span class="st">"Delaware"</span>, <span class="st">"Florida"</span>, <span class="st">"Georgia"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Hawaii"</span>, <span class="st">"Idaho"</span>, <span class="st">"Illinois"</span>, <span class="st">"Indiana"</span>, <span class="st">"Iowa"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Kansas"</span>, <span class="st">"Kentucky"</span>, <span class="st">"Louisiana"</span>, <span class="st">"Maine"</span>, <span class="st">"Maryland"</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Massachusetts"</span>, <span class="st">"Michigan"</span>, <span class="st">"Minnesota"</span>, <span class="st">"Mississippi"</span>, <span class="st">"Missouri"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Montana"</span>, <span class="st">"Nebraska"</span>, <span class="st">"Nevada"</span>, <span class="st">"New Hampshire"</span>, <span class="st">"New Jersey"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"New Mexico"</span>, <span class="st">"New York"</span>, <span class="st">"North Carolina"</span>, <span class="st">"North Dakota"</span>, <span class="st">"Ohio"</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Oklahoma"</span>, <span class="st">"Oregon"</span>, <span class="st">"Pennsylvania"</span>, <span class="st">"Rhode Island"</span>, <span class="st">"South Carolina"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"South Dakota"</span>, <span class="st">"Tennessee"</span>, <span class="st">"Texas"</span>, <span class="st">"Utah"</span>, <span class="st">"Vermont"</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Virginia"</span>, <span class="st">"Washington"</span>, <span class="st">"West Virginia"</span>, <span class="st">"Wisconsin"</span>, <span class="st">"Wyoming"</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>text<span class="ot">&lt;-</span><span class="fu">data.frame</span>()</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>subreddit<span class="ot">=</span><span class="st">"RealEstate"</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (state <span class="cf">in</span> states){</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    state_df<span class="ot">&lt;-</span> <span class="fu">find_thread_urls</span>(<span class="at">keywords =</span> state,<span class="at">subreddit=</span>subreddit, <span class="at">sort_by=</span><span class="st">"top"</span>, <span class="at">period =</span> <span class="st">'year'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    state_df<span class="ot">&lt;-</span>state_df<span class="sc">|&gt;</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">State=</span>state)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    text<span class="ot">&lt;-</span><span class="fu">rbind</span>(text,state_df)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>baseURL <span class="op">=</span> <span class="st">"https://newsapi.org/v2/everything?"</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>total_requests<span class="op">=</span><span class="dv">2</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>verbose<span class="op">=</span><span class="va">True</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># THIS CODE WILL NOT WORK UNLESS YOU INSERT YOUR API KEY IN THE NEXT LINE</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>API_KEY<span class="op">=</span><span class="st">'6a2b4aca491e4bedb90a4c7275f2ddf6'</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>TOPIC<span class="op">=</span><span class="st">'Real Estate'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>URLpost <span class="op">=</span> {<span class="st">'apiKey'</span>: API_KEY,</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>            <span class="st">'q'</span>: <span class="st">'+'</span><span class="op">+</span>TOPIC,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">'sortBy'</span>: <span class="st">'relevancy'</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">'totalRequests'</span>: <span class="dv">1</span>}</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(baseURL)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># print(URLpost)</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#GET DATA FROM API</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(baseURL, URLpost) <span class="co">#request data from the server</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># print(response.url);  </span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> response.json() <span class="co">#extract txt data from request into json</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># PRETTY PRINT</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># https://www.digitalocean.com/community/tutorials/python-pretty-print-json</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co">#print(json.dumps(response, indent=2))</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="co"># #GET TIMESTAMP FOR PULL REQUEST</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="co">#from datetime import datetime</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co">#timestamp = datetime.now().strftime("%Y-%m-%d-H%H-M%M-S%S")</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="co"># SAVE TO FILE </span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="co">#with open(timestamp+'-newapi-raw-data.json', 'w') as outfile:</span></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">#json.dump(response, outfile, indent=4)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>https://newsapi.org/v2/everything?</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> string_cleaner(input_string):</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>: </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        out<span class="op">=</span>re.sub(<span class="vs">r"""</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="vs">                    [,.;@#?!&amp;$-]+  # Accept one or more copies of punctuation</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="vs">                    \ *           # plus zero or more copies of a space,</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="vs">                    """</span>,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                    <span class="st">" "</span>,          <span class="co"># and replace it with a single space</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                    input_string, flags<span class="op">=</span>re.VERBOSE)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">#REPLACE SELECT CHARACTERS WITH NOTHING</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        out <span class="op">=</span> re.sub(<span class="st">'[’.]+'</span>, <span class="st">''</span>, input_string)</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">#ELIMINATE DUPLICATE WHITESPACES USING WILDCARDS</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>        out <span class="op">=</span> re.sub(<span class="vs">r'\s+'</span>, <span class="st">' '</span>, out)</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">#CONVERT TO LOWER CASE</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>        out<span class="op">=</span>out.lower()</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"ERROR"</span>)</span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        out<span class="op">=</span><span class="st">''</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>article_list<span class="op">=</span>response[<span class="st">'articles'</span>]   <span class="co">#list of dictionaries for each article</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>article_keys<span class="op">=</span>article_list[<span class="dv">0</span>].keys()</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"AVAILABLE KEYS:"</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(article_keys)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>index<span class="op">=</span><span class="dv">0</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>cleaned_data<span class="op">=</span>[]<span class="op">;</span>  </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> article <span class="kw">in</span> article_list:</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    tmp<span class="op">=</span>[]</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> key <span class="kw">in</span> article_keys:</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="op">==</span><span class="st">'source'</span>):</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>            src<span class="op">=</span>string_cleaner(article[key][<span class="st">'name'</span>])</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>            tmp.append(src) </span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="op">==</span><span class="st">'author'</span>):</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>            author<span class="op">=</span>string_cleaner(article[key])</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>            <span class="co">#ERROR CHECK (SOMETIMES AUTHOR IS SAME AS PUBLICATION)</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(src <span class="kw">in</span> author): </span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">" AUTHOR ERROR:"</span>,author)<span class="op">;</span>author<span class="op">=</span><span class="st">'NA'</span></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            tmp.append(author)</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="op">==</span><span class="st">'title'</span>):</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            tmp.append(string_cleaner(article[key]))</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># if(key=='description'):</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>        <span class="co">#     tmp.append(string_cleaner(article[key]))</span></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># if(key=='content'):</span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>        <span class="co">#     tmp.append(string_cleaner(article[key]))</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(key<span class="op">==</span><span class="st">'publishedAt'</span>):</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>            <span class="co">#DEFINE DATA PATERN FOR RE TO CHECK  .* --&gt; wildcard</span></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>            ref <span class="op">=</span> re.<span class="bu">compile</span>(<span class="st">'.*-.*-.*T.*:.*:.*Z'</span>)</span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>            date<span class="op">=</span>article[key]</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="kw">not</span> ref.match(date)):</span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">" DATE ERROR:"</span>,date)<span class="op">;</span> date<span class="op">=</span><span class="st">"NA"</span></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>            tmp.append(date)</span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    cleaned_data.append(tmp)</span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    index<span class="op">+=</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>AVAILABLE KEYS:
-dict_keys(['source', 'author', 'title', 'description', 'url', 'urlToImage', 'publishedAt', 'content'])
- AUTHOR ERROR: grit daily
- AUTHOR ERROR: grit daily
- AUTHOR ERROR: abdo riani, senior contributor, abdo riani, senior contributor https://wwwforbescom/sites/abdoriani/
- AUTHOR ERROR: christopher marquis, contributor, christopher marquis, contributor https://wwwforbescom/sites/christophermarquis/
- AUTHOR ERROR: tmz staff</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>cleaned_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
-<pre><code>[['business insider',
-  'jennifer sor',
-  'distressed commercial real estate debt hit $80 billion last quarter, the highest amount in a decade',
-  '2023-10-19T15:09:14Z'],
- ['grit daily',
-  'NA',
-  'ranka vucetic on 3 common real estate problems solved by bespoke service',
-  '2023-10-31T11:00:08Z'],
- ['business insider',
-  'phil rosen',
-  "china's country garden reportedly misses final deadline for a $154 million bond payment",
-  '2023-10-18T16:25:20Z'],
- ['business insider',
-  'theron mohamed',
-  'wall street warning: ray dalio, jamie dimon, larry fink issue grim outlooks for the global economy',
-  '2023-10-25T12:55:06Z'],
- ['business insider',
-  'jennifer ortakales dawkins',
-  'tjmaxx is quietly closing stores in new york and chicago here are the confirmed locations',
-  '2023-11-02T18:54:22Z'],
- ['business insider',
-  'katherine tangalakis-lippert',
-  "who's funding hamas?",
-  '2023-10-22T00:32:03Z'],
- ['npr',
-  'jennifer ludden',
-  'to tackle homelessness faster, la has a kind of real estate agency for the unhoused',
-  '2023-10-24T13:45:55Z'],
- ['business insider',
-  'haley tenore',
-  'home prices are dropping fast in phoenix here are 6 of the lowest-priced real estate listings there right now — including one at $215,000',
-  '2023-10-15T08:52:01Z'],
- ['business insider',
-  'kelsey neubauer',
-  'the allure of tennessee: why floridians are trading their sandy beaches for a quieter life',
-  '2023-10-31T21:52:25Z'],
- ['lifehackercom',
-  'daniel oropeza',
-  'evil week: everything you can find out about someone from public information',
-  '2023-11-01T17:54:00Z'],
- ['npr',
-  'alana wise',
-  "'breakfast club' host dj envy is being sued for alleged investment fraud",
-  '2023-10-28T12:01:08Z'],
- ['business insider',
-  'hana r alberts',
-  "a new 'wake-up call for real-estate agents' could reshape how we buy and sell homes",
-  '2023-11-01T19:25:37Z'],
- ['business insider',
-  'james rodriguez',
-  'real-estate agents may be forced to charge home buyers less, thanks to a new $18 billion verdict',
-  '2023-11-05T11:22:01Z'],
- ['grit daily',
-  'NA',
-  'how techvestor uses data to excel in the short-term rental market',
-  '2023-10-24T11:00:31Z'],
- ['time',
-  'oliver staley',
-  'the housing market is so bad that zillow is offering buyers free money',
-  '2023-10-18T15:47:00Z'],
- ['business insider',
-  'huileng tan',
-  "jeff bezos just added yet another property to his 'billionaire bunker' collection after snapping up a 7-bedroom mansion for $79 million: report",
-  '2023-10-13T04:36:07Z'],
- ['business insider',
-  'huileng tan',
-  'bad news, homeowners: 1 of these 3 things needs to happen for house prices to be considered affordable, says a real estate expert',
-  '2023-10-10T04:06:04Z'],
- ['business insider',
-  'tanza loudenback,lisa niser, ea',
-  'inheritance tax: what it is, who has to pay, and how to avoid it',
-  '2023-10-23T19:08:48Z'],
- ['business insider',
-  'sawdah bhaimiya',
-  'google and property developer lendlease ended a deal on $15 billion of bay area real estate projects, as big tech continues to review the role of offices',
-  '2023-11-03T11:58:26Z'],
- ['forbes',
-  'NA',
-  '5 startup opportunities in real estate',
-  '2023-10-27T13:17:21Z'],
- ['business insider',
-  'tom carter',
-  "wework's inevitable retreat is here",
-  '2023-11-02T12:51:18Z'],
- ['wired',
-  'christopher null',
-  'hp spectre foldable review: a $5,000 laptop',
-  '2023-10-29T11:00:00Z'],
- ['boing boing',
-  'rob beschizza',
-  'ftx executives blew $8bn on real estate deals, donations to politicians, random "endorsements" and various other stupid things',
-  '2023-10-19T23:41:44Z'],
- ['slashdotorg',
-  'editordavid',
-  'dropbox returns over 25% of its san francisco hq to its landlord',
-  '2023-10-22T11:34:00Z'],
- ['business insider',
-  'kneubauer@insidercom (kelsey neubauer)',
-  'floridians are looking to move to these 7 states',
-  '2023-10-17T09:30:01Z'],
- ['business insider',
-  'kylie kirschner',
-  'home prices are dropping in las vegas here are 5 of the cheapest homes for sale right now — all under $300k',
-  '2023-10-26T15:17:37Z'],
- ['business insider',
-  'pete syme',
-  "a condo on new york's billionaires' row sells for less than half of its original $135 million asking price",
-  '2023-10-25T14:31:51Z'],
- ['business insider',
-  'lloyd lee',
-  'the average monthly mortgage on a new home is 52% higher than the average rent on an apartment: report',
-  '2023-10-23T05:37:28Z'],
- ['business insider',
-  'phil rosen',
-  "china's property sector is facing massive risks and authorities must meet it with 'forceful action', imf says",
-  '2023-10-10T12:59:54Z'],
- ['readwrite',
-  'radek zielinski',
-  'google backs out of $15b bay area campus deals',
-  '2023-11-04T13:00:31Z'],
- ['cool hunting',
-  'david graver',
-  'interview: master distiller viridiana tinoco on clase azuls latest flavorful expression',
-  '2023-11-01T17:24:05Z'],
- ['bloggercom',
-  'calculated risk',
-  'real estate newsletter articles this week: new home sales increase to 759,000 annual rate in september',
-  '2023-10-28T18:11:00Z'],
- ['boing boing',
-  'jennifer sandlin',
-  'sisters win workplace halloween costume award for this amazing roller coaster costume',
-  '2023-11-02T13:12:05Z'],
- ['boing boing',
-  'jason weisberger',
-  'trump idolizes al capone in lament over multiple indictments',
-  '2023-10-10T15:42:48Z'],
- ['business insider',
-  'laura italiano',
-  "allen weisselberg, trump's loyal ex-cfo, calls tripling the size of trump's penthouse in financial records a 'minor' mistake",
-  '2023-10-10T16:44:46Z'],
- ['bloggercom',
-  'calculated risk',
-  'real estate newsletter articles this week: current state of the housing market',
-  '2023-10-14T18:11:00Z'],
- ['small business trends',
-  'michael guta',
-  '5 real estate email templates',
-  '2023-10-10T08:21:20Z'],
- ['bloggercom',
-  'calculated risk',
-  'real estate newsletter articles this week: outstanding mortgage rates, ltv and credit scores',
-  '2023-10-07T18:11:00Z'],
- ['bloggercom',
-  'calculated risk',
-  'real estate newsletter articles this week: existing-home sales decreased to new cycle low',
-  '2023-10-21T18:11:00Z'],
- ['boing boing',
-  'david pescovitz',
-  'for $15 million, you could own this large san francisco bay area home featuring six bedroom, four baths, and a meth lab!',
-  '2023-10-30T21:27:49Z'],
- ['business insider',
-  'phil rosen',
-  "investors warn evergrande could face an 'uncontrolled collapse' that would be a disaster for china's property sector",
-  '2023-10-09T16:32:15Z'],
- ['business insider',
-  'claire turrell',
-  "i converted a sheep barn into an airbnb with $2,000 now, i manage over 100 listings here's how i grew my business and weathered the airbnb apocalypse",
-  '2023-10-19T09:13:27Z'],
- ['business insider',
-  'aria yang',
-  "i quit my $370k job at meta after having panic attacks and hitting the lowest point of my life i just knew the job wasn't right for me",
-  '2023-10-09T09:07:01Z'],
- ['business insider',
-  'cork gaines',
-  "uk household wealth has tanked and it's a sign of what could happen in the us",
-  '2023-11-01T10:05:02Z'],
- ['business insider',
-  'insider@insidercom (eliza relman)',
-  "home sweet times square: how new york city can save midtown manhattan from the 'urban doom loop'",
-  '2023-10-08T09:57:01Z'],
- ['business insider',
-  'daniel geiger,ellen thomas,alistair barr',
-  'data centers are sprouting up as a result of the ai boom, minting fortunes, sucking up energy, and changing rural america',
-  '2023-10-13T16:15:37Z'],
- ['business insider',
-  'filip de mott',
-  'ether could jump 400% in a few years before staging a longer-term rally to $35,000, standard chartered says',
-  '2023-10-11T15:45:12Z'],
- ['business insider',
-  'theron mohamed',
-  "elon musk warned of cybertruck headaches, consumers' debt woes, and a 'stormy' economic backdrop on tesla's earnings call here are his 14 best quotes",
-  '2023-10-19T11:36:55Z'],
- ['business insider',
-  'huileng tan',
-  'jeff bezos is moving to miami after 29 years in seattle',
-  '2023-11-03T01:34:19Z'],
- ['bloggercom',
-  'calculated risk',
-  'real estate newsletter articles this week: national house price index up 26% year-over-year in august',
-  '2023-11-04T18:11:00Z'],
- ['bbc news',
-  'https://wwwfacebookcom/bbcnews',
-  "judge threatens to jail trump for 'blatant' gag order violation",
-  '2023-10-20T16:53:13Z'],
- ['business insider',
-  'jacob zinkula',
-  '3 reasons it could be the right time to buy a home, despite high interest rates',
-  '2023-10-22T10:18:01Z'],
- ['business insider',
-  'tom carter',
-  'dropbox plans to pay $79 million to shrink its huge sf office, after ceo says the rto push will fail',
-  '2023-10-23T11:39:17Z'],
- ['business insider',
-  'theron mohamed',
-  "'rich dad poor dad' author echoes warren buffett's signature warning against trying to time the market",
-  '2023-10-23T11:08:59Z'],
- ['business insider',
-  'john l dorman',
-  'trump mixed up square miles and acres when he bragged to romney about returning land to utah, book says',
-  '2023-10-25T16:11:25Z'],
- ['business insider',
-  'kelsey neubauer',
-  "locals are being priced out of texas and florida here's where they're looking for affordable homes instead",
-  '2023-10-15T09:07:01Z'],
- ['business insider',
-  'llopez@insidercom (linette lopez)',
-  'the great china boom is going bust',
-  '2023-10-15T10:22:02Z'],
- ['ritholtzcom',
-  'barry ritholtz',
-  'bubble risk in city property markets?',
-  '2023-10-30T13:00:35Z'],
- ['business insider',
-  'theron mohamed',
-  "jpmorgan's dimon warns the fed's inflation war will spook markets - and flags a raft of threats to the us economy",
-  '2023-11-02T11:08:06Z'],
- ['business insider',
-  'jzitser@businessinsidercom (joshua zitser)',
-  "i advise lottery winners it's easy to make bad decisions – here's what i tell people so they don't blow all their money",
-  '2023-10-07T08:30:46Z'],
- ['business insider',
-  'theron mohamed',
-  "be ready for the s&amp;p 500 to crash by 50%, house prices to slide, and a recession to strike, jeremy grantham says here are the elite investor's 16 best quotes from a new interview",
-  '2023-10-07T10:35:01Z'],
- ['business insider',
-  'theron mohamed',
-  "the fed's own economists are predicting a goldilocks scenario: no recession, falling inflation, and flat unemployment",
-  '2023-10-12T14:01:38Z'],
- ['business insider',
-  'filip de mott',
-  'capital is leaving china at the fastest pace in more than 7 years, sending the yuan lower',
-  '2023-10-23T14:24:41Z'],
- ['npr',
-  'greg allen',
-  "feeling the pinch of high home insurance rates? it's not getting better anytime soon",
-  '2023-10-26T09:01:17Z'],
- ['uncratecom', 'uncrate', 'sony ps5 slim console', '2023-10-10T19:00:00Z'],
- ['business insider',
-  'adam rogers',
-  'dont blame the pandemic for all the empty storefronts on your street blame big banks',
-  '2023-10-31T09:55:01Z'],
- ['business insider',
-  'jacob shamsian',
-  'trump waited until after he left office to disclose trademarks he owns in china and russia',
-  '2023-11-03T16:38:50Z'],
- ['pitchfork',
-  'evan minsker, matthew strauss',
-  'kevin abstract announces first solo album since brockhamptons indefinite hiatus',
-  '2023-10-11T16:07:44Z'],
- ['forbes',
-  'NA',
-  'modern estate planning that prioritizes people, communities, and the planet',
-  '2023-10-10T13:15:00Z'],
- ['bloggercom',
-  'calculated risk',
-  'fed sloos survey: banks reported tighter standards, weaker demand for all loan types',
-  '2023-11-06T19:00:00Z'],
- ['macrumors',
-  'juli clover',
-  "have a 13-inch macbook pro? here's why you should upgrade to the new m3 14-inch model",
-  '2023-11-01T19:06:51Z'],
- ['business insider',
-  'mberg@insidercom (madeline berg)',
-  "there's one thing taylor swift isn't talking about",
-  '2023-11-01T09:24:01Z'],
- ['thekitchncom',
-  'ian burke',
-  'this ingenious countertop gadget creates storage out of thin air and matches any kitchen aesthetic',
-  '2023-10-16T20:40:00Z'],
- ['business insider',
-  'jen glantz',
-  'i want to retire before 50, so i asked a financial planner for 3 ways to earn more on my savings',
-  '2023-10-28T11:29:01Z'],
- ['business insider',
-  'jennifer sor',
-  'why now is actually a good time to buy a house',
-  '2023-10-21T12:15:01Z'],
- ['the verge',
-  'elizabeth lopatto',
-  'in the end, the ftx trial was about the friends screwed along the way',
-  '2023-10-26T12:00:00Z'],
- ['business insider',
-  'polly thompson',
-  'joe biden wants more people to start living in empty offices',
-  '2023-10-28T11:33:18Z'],
- ['business insider',
-  'george glover',
-  'china suffers its first foreign investment deficit as us tensions and anti-spying laws spark a western exodus',
-  '2023-11-06T10:07:34Z'],
- ['ritholtzcom',
-  'barry ritholtz',
-  '10 tuesday am reads',
-  '2023-10-31T10:30:05Z'],
- ['business insider',
-  'filip de mott',
-  'beijing will offer fresh stimulus through a rare budget adjustment and increased sovereign debt',
-  '2023-10-24T15:54:56Z'],
- ['business insider',
-  'madeline berg',
-  "jeff bezos' net worth: how the ex-amazon ceo went from startup founder to one of the richest people in the world",
-  '2023-11-01T09:16:02Z'],
- ['business insider',
-  'katie balevic,jacob shamsian,lloyd lee',
-  'a jury found sam bankman-fried guilty in his manhattan criminal trial',
-  '2023-11-03T00:02:12Z'],
- ['business insider',
-  'aaron mok,katie balevic,jacob shamsian',
-  "sbf's mom fought back tears and his dad slumped down when the jury said their son was guilty on all 7 counts",
-  '2023-11-03T17:56:18Z'],
- ['theregistercom',
-  'laura dobberstein',
-  'google shelves plan to build four san francisco googleburbs',
-  '2023-11-03T08:29:09Z'],
- ['business insider',
-  'cork gaines',
-  'home buyers are finally seeing a light at the end of the tunnel, but it is going to be painful for homeowners and sellers',
-  '2023-10-10T15:19:30Z'],
- ['business insider',
-  'mia jankowicz',
-  "gigi hadid condemns 'terrorizing of innocent people' in instagram post following hamas attacks on israel",
-  '2023-10-11T11:56:16Z'],
- ['business insider',
-  'phil rosen',
-  'china is boosting efforts spread the yuan as it sells a record $75 billion in offshore bonds this year',
-  '2023-10-11T17:36:44Z'],
- ['business insider',
-  'phil rosen',
-  "china's economy is on shaky ground - but its movie industry is hitting historic box office records",
-  '2023-10-16T13:20:48Z'],
- ['business insider',
-  'george glover',
-  'elite investor john paulson claims in a new lawsuit that his ex-business partner duped him out of millions to fund louis vuitton shopping sprees and las vegas parties',
-  '2023-10-17T11:15:36Z'],
- ['business insider',
-  'hasan chowdhury',
-  'office vacancies have soared to a 20-year high, showing just how tough it is to get workers to return',
-  '2023-10-10T11:56:13Z'],
- ['business insider',
-  'jennifer sor',
-  "home foreclosures are at their highest level since the start of the pandemic as the 'financial aftermath' take a toll on buyers",
-  '2023-10-13T13:48:49Z'],
- ['business insider',
-  'filip de mott',
-  "'bond king' jeffrey gundlach says buy long-dated treasurys, with prices set to rebound going into a recession",
-  '2023-10-18T18:14:51Z'],
- ['vice news',
-  'roshan abraham, jordan pearson',
-  'realtor influencers are freaking out after $18 billion conspiracy lawsuit',
-  '2023-11-06T18:37:39Z'],
- ['small business trends',
-  'samantha lile',
-  'how to hire a property manager',
-  '2023-10-18T13:00:57Z'],
- ['the washington post',
-  'rachel kurzius',
-  'how to sell a haunted house',
-  '2023-10-23T12:42:01Z'],
- ['theonioncom',
-  'the onion',
-  'donald trump jr takes witness stand in new york fraud trial against father',
-  '2023-11-02T19:09:00Z'],
- ['tmz',
-  'NA',
-  "jeff bezos buys florida neighbor's mansion for $79 million",
-  '2023-10-13T16:07:48Z'],
- ['business insider',
-  'kelsey neubauer',
-  'stay or go: why americans are drawn to — or sick of — living in florida',
-  '2023-11-03T16:19:17Z'],
- ['gizmodocom',
-  'dua rashid',
-  'roccat vulcan ii review: a flashy upgrade',
-  '2023-11-02T21:00:00Z'],
- ['business insider',
-  'lakshmi varanasi',
-  'jeff bezos is moving to miami meet some of his neighbors in the exclusive ‘billionaire bunker neighborhood',
-  '2023-11-03T21:37:24Z']]</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(cleaned_data)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>df.to_csv(<span class="st">'./data/news.csv'</span>, index<span class="op">=</span><span class="va">False</span>) <span class="co">#,index_label=['title','src','author','date','description'])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                   0                           1  \
-0   business insider                jennifer sor   
-1         grit daily                          NA   
-2   business insider                  phil rosen   
-3   business insider              theron mohamed   
-4   business insider  jennifer ortakales dawkins   
-..               ...                         ...   
-95       theonioncom                   the onion   
-96               tmz                          NA   
-97  business insider             kelsey neubauer   
-98        gizmodocom                  dua rashid   
-99  business insider            lakshmi varanasi   
-
-                                                    2                     3  
-0   distressed commercial real estate debt hit $80...  2023-10-19T15:09:14Z  
-1   ranka vucetic on 3 common real estate problems...  2023-10-31T11:00:08Z  
-2   china's country garden reportedly misses final...  2023-10-18T16:25:20Z  
-3   wall street warning: ray dalio, jamie dimon, l...  2023-10-25T12:55:06Z  
-4   tjmaxx is quietly closing stores in new york a...  2023-11-02T18:54:22Z  
-..                                                ...                   ...  
-95  donald trump jr takes witness stand in new yor...  2023-11-02T19:09:00Z  
-96  jeff bezos buys florida neighbor's mansion for...  2023-10-13T16:07:48Z  
-97  stay or go: why americans are drawn to — or si...  2023-11-03T16:19:17Z  
-98          roccat vulcan ii review: a flashy upgrade  2023-11-02T21:00:00Z  
-99  jeff bezos is moving to miami meet some of his...  2023-11-03T21:37:24Z  
-
-[100 rows x 4 columns]</code></pre>
-</div>
-</div>
-</section>
-<section id="download" class="level1">
-<h1>Download</h1>
-<p>https://www.zillow.com/research/data/</p>
 
 
 </section>
